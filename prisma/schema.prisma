@@ -1,0 +1,849 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URI")
+}
+
+// ---------------------------------------------------------------------------
+// Auth / RBAC
+// ---------------------------------------------------------------------------
+
+enum Role {
+  SUPER_ADMIN
+  CONTENT_EDITOR
+  EVENTS_MANAGER
+  PROGRAM_MANAGER
+  COMMUNICATIONS_MANAGER
+  CHAPTER_ADMINISTRATOR
+  FINANCE_ADMINISTRATOR
+  CHECK_IN_STAFF
+  AUTHOR
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role
+  chapterId    String?
+  chapter      Chapter? @relation("ChapterAdmins", fields: [chapterId], references: [id])
+  personId     String?  @unique
+  person       Person?  @relation(fields: [personId], references: [id])
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions          Session[]
+  assignedEvents    EventCheckInStaff[]
+  authoredArticles  Article[]            @relation("ArticleCreatedBy")
+  reviewedApplications Application[]     @relation("ApplicationReviewer")
+  checkIns          Registration[]       @relation("RegistrationCheckedInBy")
+  handledInquiries  Inquiry[]            @relation("InquiryHandledBy")
+  auditLogs         AuditLog[]
+  programsManaged   Program[]            @relation("ProgramManager")
+
+  @@index([role])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Media
+// ---------------------------------------------------------------------------
+
+model Media {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  mimeType  String
+  size      Int
+  width     Int?
+  height    Int?
+  alt       String
+  caption   String?
+  credit    String?
+  tags      String[]
+  createdAt DateTime @default(now())
+
+  personHeadshots       Person[]
+  organizationLogos     Organization[]
+  chapterCovers         Chapter[]
+  programHeroImages     Program[]
+  eventCovers           Event[]        @relation("EventCover")
+  eventGalleries        Event[]        @relation("EventGallery")
+  sessionResources      EventSession[] @relation("SessionResources")
+  speakerPhotoOverrides Speaker[]
+  articleHeroImages     Article[]
+  storyCoverImages      Story[]
+  partnershipAgreements Partnership[]
+  projectGalleries      Project[]      @relation("ProjectGallery")
+}
+
+// ---------------------------------------------------------------------------
+// People — the unified hub
+// ---------------------------------------------------------------------------
+
+enum PillarTag {
+  EDUCATOR
+  LEADER
+  ENTREPRENEUR
+  CREATIVE
+  TECHNOCRAT
+}
+
+enum PersonStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Person {
+  id                String       @id @default(cuid())
+  firstName         String
+  lastName          String
+  slug              String       @unique
+  headshotId        String?
+  headshot          Media?       @relation(fields: [headshotId], references: [id])
+  title             String?
+  organizationId    String?
+  organization      Organization? @relation(fields: [organizationId], references: [id])
+  country           String?
+  homeChapterId     String?
+  homeChapter       Chapter?     @relation("ChapterMembers", fields: [homeChapterId], references: [id])
+  bio               String?
+  pillarTags        PillarTag[]
+  email             String?      @unique
+  phone             String?
+  consentToPublish  Boolean      @default(false)
+  status            PersonStatus @default(ACTIVE)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  userAccount       User?
+  affiliations      PersonAffiliation[]
+  speakerAppearances Speaker[]
+  articleAuthorships ArticleAuthor[]
+  storiesFeatured   Story[]             @relation("StoryFeaturedPerson")
+  registrations     Registration[]
+  applications      Application[]
+  primaryForOrgs    Organization[]      @relation("OrganizationPrimaryContact")
+  partnershipsAsContact Partnership[]   @relation("PartnershipPrimaryContact")
+  leadOfChapters    Chapter[]           @relation("ChapterLead")
+
+  @@index([slug])
+}
+
+enum AffiliationType {
+  MEMBER
+  FELLOW
+  VOLUNTEER
+  PARTNER_CONTACT
+  CONTRIBUTOR
+}
+
+enum AffiliationStatus {
+  ACTIVE
+  ENDED
+}
+
+model PersonAffiliation {
+  id                String            @id @default(cuid())
+  personId          String
+  person            Person            @relation(fields: [personId], references: [id], onDelete: Cascade)
+  affiliationType   AffiliationType
+  relatedChapterId  String?
+  relatedChapter    Chapter?          @relation(fields: [relatedChapterId], references: [id])
+  relatedOrganizationId String?
+  relatedOrganization   Organization? @relation(fields: [relatedOrganizationId], references: [id])
+  relatedProgramId  String?
+  relatedProgram    Program?          @relation(fields: [relatedProgramId], references: [id])
+  startDate         DateTime?
+  endDate           DateTime?
+  status            AffiliationStatus @default(ACTIVE)
+
+  @@index([personId])
+}
+
+// ---------------------------------------------------------------------------
+// Organizations / Partners
+// ---------------------------------------------------------------------------
+
+enum OrganizationType {
+  CHURCH_MINISTRY
+  CORPORATE
+  NGO
+  GOVERNMENT
+  MEDIA
+  ACADEMIC
+}
+
+model Organization {
+  id                 String           @id @default(cuid())
+  name               String
+  slug               String           @unique
+  logoId             String?
+  logo               Media?           @relation(fields: [logoId], references: [id])
+  type               OrganizationType
+  website            String?
+  description        String?
+  country            String?
+  primaryContactId   String?
+  primaryContact     Person?          @relation("OrganizationPrimaryContact", fields: [primaryContactId], references: [id])
+  partnershipTier    String?
+  featuredOnHomepage Boolean          @default(false)
+  seoTitle           String?
+  seoDescription     String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  people           Person[]
+  affiliations     PersonAffiliation[]
+  partnerships     Partnership[]
+  speakerOverrides Speaker[]
+
+  @@index([slug])
+}
+
+// ---------------------------------------------------------------------------
+// Chapters
+// ---------------------------------------------------------------------------
+
+enum ChapterStatus {
+  ACTIVE
+  FORMING
+  PLANNED
+}
+
+model Chapter {
+  id            String        @id @default(cuid())
+  country       String
+  name          String
+  slug          String        @unique
+  leadPersonId  String?
+  leadPerson    Person?       @relation("ChapterLead", fields: [leadPersonId], references: [id])
+  coverImageId  String?
+  coverImage    Media?        @relation(fields: [coverImageId], references: [id])
+  description   String?
+  contactEmail  String?
+  launchDate    DateTime?
+  status        ChapterStatus @default(PLANNED)
+  seoTitle      String?
+  seoDescription String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  admins        User[]              @relation("ChapterAdmins")
+  members       Person[]            @relation("ChapterMembers")
+  affiliations  PersonAffiliation[]
+  events        Event[]
+  projects      ProjectChapter[]
+  partnerships  Partnership[]
+  stories       Story[]             @relation("StoryRelatedChapter")
+
+  @@index([slug])
+  @@index([country])
+}
+
+// ---------------------------------------------------------------------------
+// Programs
+// ---------------------------------------------------------------------------
+
+enum ProgramStatus {
+  OPEN_FOR_APPLICATIONS
+  ONGOING
+  CLOSED
+  ARCHIVED
+}
+
+model Program {
+  id                 String        @id @default(cuid())
+  title              String
+  slug               String        @unique
+  summary            String
+  description        String
+  pillarTags         PillarTag[]
+  heroImageId        String?
+  heroImage          Media?        @relation(fields: [heroImageId], references: [id])
+  status             ProgramStatus @default(ONGOING)
+  programManagerId   String?
+  programManager     User?         @relation("ProgramManager", fields: [programManagerId], references: [id])
+  featuredOnHomepage Boolean       @default(false)
+  seoTitle           String?
+  seoDescription     String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  cohorts       Cohort[]
+  affiliations  PersonAffiliation[]
+  applications  Application[]
+  articles      Article[]           @relation("ArticleRelatedProgram")
+  stories       Story[]             @relation("StoryRelatedProgram")
+  partnerships  Partnership[]
+  projects      Project[]           @relation("ProjectOwningProgram")
+
+  @@index([slug])
+}
+
+model Cohort {
+  id              String    @id @default(cuid())
+  programId       String
+  program         Program   @relation(fields: [programId], references: [id], onDelete: Cascade)
+  name            String
+  startDate       DateTime?
+  endDate         DateTime?
+  capacity        Int?
+  applicationFormId String?
+  applicationForm FormDefinition? @relation(fields: [applicationFormId], references: [id])
+
+  applications Application[]
+
+  @@index([programId])
+}
+
+// ---------------------------------------------------------------------------
+// Events / Sessions / Speakers
+// ---------------------------------------------------------------------------
+
+enum EventType {
+  SITUATION_ROOM
+  REGIONAL_SUMMIT
+  CHAPTER_MEETUP
+  WEBINAR
+  TRAINING
+}
+
+enum EventLifecycleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EventRegistrationStatus {
+  OPEN
+  WAITLIST
+  CLOSED
+}
+
+model Event {
+  id                  String                   @id @default(cuid())
+  title               String
+  slug                String                   @unique
+  type                EventType
+  summary             String
+  description         String
+  startDate           DateTime
+  endDate             DateTime
+  timezone            String                   @default("Africa/Lagos")
+  venueName           String?
+  venueAddress        String?
+  venueCity           String?
+  venueCountry        String?
+  mapEmbedUrl         String?
+  isVirtual           Boolean                  @default(false)
+  virtualLink         String?
+  chapterId           String?
+  chapter             Chapter?                 @relation(fields: [chapterId], references: [id])
+  coverImageId        String?
+  coverImage          Media?                   @relation("EventCover", fields: [coverImageId], references: [id])
+  gallery             Media[]                  @relation("EventGallery")
+  registrationFormId  String?
+  registrationForm    FormDefinition?          @relation(fields: [registrationFormId], references: [id])
+  capacity            Int?
+  registrationStatus  EventRegistrationStatus  @default(OPEN)
+  status              EventLifecycleStatus     @default(DRAFT)
+  featuredOnHomepage  Boolean                  @default(false)
+  seoTitle            String?
+  seoDescription      String?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+
+  sessions      EventSession[]
+  speakers      Speaker[]
+  registrations Registration[]
+  checkInStaff  EventCheckInStaff[]
+  articles      Article[]           @relation("ArticleRelatedEvent")
+  stories       Story[]             @relation("StoryRelatedEvent")
+  partnerships  Partnership[]
+
+  @@index([slug])
+  @@index([status])
+}
+
+model EventCheckInStaff {
+  id      String @id @default(cuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+enum SessionType {
+  PLENARY
+  ROUNDTABLE
+  WORKSHOP
+  PANEL
+}
+
+model EventSession {
+  id        String      @id @default(cuid())
+  eventId   String
+  event     Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  title     String
+  track     String?
+  startTime DateTime
+  endTime   DateTime
+  sessionType SessionType
+  speakers  Speaker[]   @relation("SessionSpeakers")
+  resources Media[]     @relation("SessionResources")
+
+  @@index([eventId])
+}
+
+model Speaker {
+  id                    String   @id @default(cuid())
+  eventId               String
+  event                 Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  personId              String
+  person                Person   @relation(fields: [personId], references: [id])
+  organizationOverrideId String?
+  organizationOverride  Organization? @relation(fields: [organizationOverrideId], references: [id])
+  bioOverride           String?
+  photoOverrideId       String?
+  photoOverride         Media?   @relation(fields: [photoOverrideId], references: [id])
+
+  sessions EventSession[] @relation("SessionSpeakers")
+
+  @@unique([eventId, personId])
+}
+
+// ---------------------------------------------------------------------------
+// Editorial: Articles (Kingdom Intelligence / Insights) & Stories
+// ---------------------------------------------------------------------------
+
+enum ContentStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum InsightCategory {
+  RESEARCH
+  POLICY
+  GOVERNANCE
+  LEADERSHIP
+  ECONOMY
+  TECHNOLOGY
+  EDUCATION
+  CULTURE
+  INNOVATION
+  TERRITORIES
+}
+
+model Article {
+  id                String          @id @default(cuid())
+  title             String
+  slug              String          @unique
+  subtitle          String?
+  category          InsightCategory
+  body              String
+  heroImageId       String?
+  heroImage         Media?          @relation(fields: [heroImageId], references: [id])
+  excerpt           String
+  publishedDate     DateTime?
+  pillarTags        PillarTag[]
+  relatedProgramId  String?
+  relatedProgram    Program?        @relation("ArticleRelatedProgram", fields: [relatedProgramId], references: [id])
+  relatedEventId    String?
+  relatedEvent      Event?          @relation("ArticleRelatedEvent", fields: [relatedEventId], references: [id])
+  status            ContentStatus   @default(DRAFT)
+  featuredOnHomepage Boolean        @default(false)
+  createdById       String?
+  createdBy         User?           @relation("ArticleCreatedBy", fields: [createdById], references: [id])
+  seoTitle          String?
+  seoDescription    String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  authors ArticleAuthor[]
+
+  @@index([slug])
+  @@index([status])
+}
+
+model ArticleAuthor {
+  id        String  @id @default(cuid())
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  personId  String
+  person    Person  @relation(fields: [personId], references: [id])
+
+  @@unique([articleId, personId])
+}
+
+model Story {
+  id                String        @id @default(cuid())
+  title             String
+  slug              String        @unique
+  personFeaturedId  String
+  personFeatured    Person        @relation("StoryFeaturedPerson", fields: [personFeaturedId], references: [id])
+  summary           String
+  body              String
+  coverImageId      String?
+  coverImage        Media?        @relation(fields: [coverImageId], references: [id])
+  videoUrl          String?
+  relatedChapterId  String?
+  relatedChapter    Chapter?      @relation("StoryRelatedChapter", fields: [relatedChapterId], references: [id])
+  relatedProgramId  String?
+  relatedProgram    Program?      @relation("StoryRelatedProgram", fields: [relatedProgramId], references: [id])
+  relatedEventId    String?
+  relatedEvent      Event?        @relation("StoryRelatedEvent", fields: [relatedEventId], references: [id])
+  publishedDate     DateTime?
+  status            ContentStatus @default(DRAFT)
+  featuredOnHomepage Boolean      @default(false)
+  seoTitle          String?
+  seoDescription    String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([slug])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Forms / Registrations / Applications
+// ---------------------------------------------------------------------------
+
+enum ConfirmationType {
+  MESSAGE
+  REDIRECT
+}
+
+model FormDefinition {
+  id                String           @id @default(cuid())
+  name              String
+  slug              String           @unique
+  fields            Json
+  confirmationType  ConfirmationType @default(MESSAGE)
+  confirmationMessage String?
+  redirectUrl       String?
+  notificationEmails String[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  events        Event[]
+  cohorts       Cohort[]
+  registrations Registration[]
+  applications  Application[]
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  CONFIRMED
+  CHECKED_IN
+  ATTENDED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  NOT_APPLICABLE
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Registration {
+  id               String              @id @default(cuid())
+  eventId          String
+  event            Event               @relation(fields: [eventId], references: [id])
+  formId           String?
+  form             FormDefinition?     @relation(fields: [formId], references: [id])
+  personId         String
+  person           Person              @relation(fields: [personId], references: [id])
+  responses        Json
+  status           RegistrationStatus  @default(REGISTERED)
+  checkedInAt      DateTime?
+  checkedInById    String?
+  checkedInBy      User?               @relation("RegistrationCheckedInBy", fields: [checkedInById], references: [id])
+  paymentStatus    PaymentStatus       @default(NOT_APPLICABLE)
+  paymentProvider  String?
+  paymentReference String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([eventId])
+  @@index([personId])
+  @@index([status])
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  SHORTLISTED
+  ACCEPTED
+  REJECTED
+  ENROLLED
+  WITHDRAWN
+}
+
+model Application {
+  id             String            @id @default(cuid())
+  programId      String
+  program        Program           @relation(fields: [programId], references: [id])
+  cohortId       String?
+  cohort         Cohort?           @relation(fields: [cohortId], references: [id])
+  formId         String?
+  form           FormDefinition?   @relation(fields: [formId], references: [id])
+  personId       String
+  person         Person            @relation(fields: [personId], references: [id])
+  responses      Json
+  status         ApplicationStatus @default(SUBMITTED)
+  reviewerNotes  String?
+  reviewedById   String?
+  reviewedBy     User?             @relation("ApplicationReviewer", fields: [reviewedById], references: [id])
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@index([programId])
+  @@index([personId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Partnerships / Projects
+// ---------------------------------------------------------------------------
+
+enum PartnershipType {
+  STRATEGIC
+  FINANCIAL
+  MEDIA
+  CHAPTER
+  IN_KIND
+}
+
+enum PartnershipStatus {
+  ACTIVE
+  PENDING
+  ENDED
+}
+
+model Partnership {
+  id                   String            @id @default(cuid())
+  organizationId       String
+  organization         Organization      @relation(fields: [organizationId], references: [id])
+  type                 PartnershipType
+  relatedProgramId     String?
+  relatedProgram       Program?          @relation(fields: [relatedProgramId], references: [id])
+  relatedEventId       String?
+  relatedEvent         Event?            @relation(fields: [relatedEventId], references: [id])
+  relatedChapterId     String?
+  relatedChapter       Chapter?          @relation(fields: [relatedChapterId], references: [id])
+  startDate            DateTime?
+  endDate              DateTime?
+  status               PartnershipStatus @default(PENDING)
+  agreementDocumentId  String?
+  agreementDocument    Media?            @relation(fields: [agreementDocumentId], references: [id])
+  value                String?
+  primaryContactId     String?
+  primaryContact       Person?           @relation("PartnershipPrimaryContact", fields: [primaryContactId], references: [id])
+  createdAt            DateTime          @default(now())
+
+  @@index([organizationId])
+}
+
+enum ProjectStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+model Project {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  description      String
+  owningProgramId  String?
+  owningProgram    Program?      @relation("ProjectOwningProgram", fields: [owningProgramId], references: [id])
+  status           ProjectStatus @default(PLANNED)
+  impactMetrics    Json?
+  gallery          Media[]       @relation("ProjectGallery")
+  seoTitle         String?
+  seoDescription   String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  chapters ProjectChapter[]
+
+  @@index([slug])
+}
+
+model ProjectChapter {
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  chapterId String
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, chapterId])
+}
+
+// ---------------------------------------------------------------------------
+// Inquiries (Contact + Get Involved)
+// ---------------------------------------------------------------------------
+
+enum InquiryType {
+  CONTACT_GENERAL
+  CONTACT_PARTNERSHIP
+  CONTACT_MEDIA
+  CONTACT_SPEAKING
+  CONTACT_INTELLIGENCE
+  CONTACT_EVENTS
+  CONTACT_OTHER
+  GET_INVOLVED_JOIN_COMMUNITY
+  GET_INVOLVED_BECOME_FELLOW
+  GET_INVOLVED_PARTNER
+  GET_INVOLVED_VOLUNTEER
+  GET_INVOLVED_ATTEND_EVENT
+  GET_INVOLVED_SUBMIT_IDEA
+  GET_INVOLVED_SUPPORT_WORK
+  GET_INVOLVED_INSTITUTIONAL_PARTNER
+}
+
+enum InquiryStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+}
+
+model Inquiry {
+  id           String        @id @default(cuid())
+  type         InquiryType
+  name         String
+  email        String
+  phone        String?
+  organization String?
+  message      String
+  metadata     Json?
+  status       InquiryStatus @default(NEW)
+  handledById  String?
+  handledBy    User?         @relation("InquiryHandledBy", fields: [handledById], references: [id])
+  createdAt    DateTime      @default(now())
+
+  @@index([type])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Structured page content (super-admin-editable flagship pages)
+// ---------------------------------------------------------------------------
+
+model SiteSettings {
+  id                  Int      @id @default(1)
+  siteName            String   @default("Kingdom E.L.E.C.T. for Africa")
+  tagline             String   @default("Building Influence. Transforming Africa.")
+  logoId              String?
+  logoMarkId          String?
+  faviconId           String?
+  contactEmail        String?
+  contactPhone        String?
+  address             String?
+  socialLinks         Json?
+  footerText          String?
+  defaultSeoTitle     String?
+  defaultSeoDescription String?
+  updatedAt           DateTime @updatedAt
+}
+
+model HomePageContent {
+  id                     Int      @id @default(1)
+  heroEyebrow            String?
+  heroHeading            String
+  heroSubheading         String
+  heroPrimaryCtaLabel    String   @default("Explore Kingdom E.L.E.C.T.")
+  heroPrimaryCtaHref     String   @default("/about")
+  heroSecondaryCtaLabel  String   @default("Enter the Situation Room")
+  heroSecondaryCtaHref   String   @default("/the-situation-room")
+  momentEyebrow          String?
+  momentHeading          String
+  momentBody             String
+  momentStats            Json
+  frameworkHeading       String
+  frameworkIntro         String
+  frameworkSteps         Json
+  fiveHeading            String
+  fiveIntro              String
+  situationRoomHeading   String
+  situationRoomBody      String
+  intelligenceHeading    String
+  intelligenceIntro      String
+  participationHeading   String
+  participationBody      String
+  participationCtaLabel  String   @default("Get Involved")
+  participationCtaHref   String   @default("/get-involved")
+  updatedAt              DateTime @updatedAt
+}
+
+model AboutPageContent {
+  id               Int      @id @default(1)
+  heroHeading      String
+  heroBody         String
+  storyHeading     String
+  storyBody        String
+  visionStatement  String
+  missionStatement String
+  purposeStatement String
+  essenceStatement String
+  objectives       Json
+  personality      Json
+  updatedAt        DateTime @updatedAt
+}
+
+model SituationRoomPageContent {
+  id                 Int      @id @default(1)
+  heroHeading        String
+  heroSubheading     String
+  philosophyStatement String
+  functions          Json
+  sessionTypes       Json
+  outcomes           Json
+  featuredEventId    String?
+  updatedAt          DateTime @updatedAt
+}
+
+model TheFivePageContent {
+  id        Int      @id @default(1)
+  heading   String
+  intro     String
+  pillars   Json
+  updatedAt DateTime @updatedAt
+}

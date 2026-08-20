@@ -1,0 +1,135 @@
+/*
+  Kingdom E.L.E.C.T. for Africa — brand color tokens.
+
+  Contrast findings (WCAG 2.1, computed against sRGB relative luminance):
+    gold on ivory   -> 2.49:1  FAILS AA even at large text. Never use gold
+                       as a text color on ivory/white. Gold is reserved for
+                       icons, borders, rules, large display numerals, and
+                       adequately-sized filled buttons (white/ivory label on
+                       a gold fill passes; gold-on-white text does not).
+    gold on navy    -> 5.98:1  PASSES AA for normal text. Gold reads as text
+                       only on navy (or charcoal) backgrounds.
+    navy on ivory   -> 14.92:1 PASSES AAA. Primary body/heading pairing.
+    charcoal/ivory  -> 13.84:1 PASSES AAA.
+    emerald/ivory   -> 11.12:1 PASSES AAA.
+*/
+
+@theme {
+  /* Raw palette: base + a hand-computed tint (toward white) / shade (toward
+     black) scale per brand color. 500 is always the approved brand hex. */
+  --color-navy-50: #f0f2f3;
+  --color-navy-100: #dde0e3;
+  --color-navy-200: #b6bcc4;
+  --color-navy-300: #8a93a0;
+  --color-navy-400: #546275;
+  --color-navy-500: #0b1f3a;
+  --color-navy-600: #091a31;
+  --color-navy-700: #081629;
+  --color-navy-800: #061120;
+  --color-navy-900: #040c17;
+
+  --color-gold-50: #fcf8f1;
+  --color-gold-100: #f7f0df;
+  --color-gold-200: #efdeba;
+  --color-gold-300: #e5cb90;
+  --color-gold-400: #d9b35d;
+  --color-gold-500: #c99218;
+  --color-gold-600: #ab7c14;
+  --color-gold-700: #8d6611;
+  --color-gold-800: #6f500d;
+  --color-gold-900: #503a0a;
+
+  --color-emerald-50: #f1f3f2;
+  --color-emerald-100: #dee4e1;
+  --color-emerald-200: #b8c5bf;
+  --color-emerald-300: #8da199;
+  --color-emerald-400: #59776a;
+  --color-emerald-500: #123c2a;
+  --color-emerald-600: #0f3324;
+  --color-emerald-700: #0d2a1d;
+  --color-emerald-800: #0a2117;
+  --color-emerald-900: #071811;
+
+  --color-ivory-50: #fffefe;
+  --color-ivory-100: #fefdfc;
+  --color-ivory-200: #fdfbf9;
+  --color-ivory-300: #fbf9f5;
+  --color-ivory-400: #f9f7f0;
+  --color-ivory-500: #f7f3ea;
+  --color-ivory-600: #d2cfc7;
+  --color-ivory-700: #adaaa4;
+  --color-ivory-800: #888681;
+  --color-ivory-900: #63615e;
+
+  --color-charcoal-50: #f2f2f2;
+  --color-charcoal-100: #e0e0e0;
+  --color-charcoal-200: #bebebe;
+  --color-charcoal-300: #969696;
+  --color-charcoal-400: #666666;
+  --color-charcoal-500: #252525;
+  --color-charcoal-600: #1f1f1f;
+  --color-charcoal-700: #1a1a1a;
+  --color-charcoal-800: #141414;
+  --color-charcoal-900: #0f0f0f;
+
+  /* Semantic aliases — components should reference these, not raw swatches,
+     so a future rebrand or dark variant is a one-file change. */
+  --color-surface: var(--color-ivory-500);
+  --color-surface-raised: var(--color-ivory-50);
+  --color-surface-inverse: var(--color-navy-500);
+  --color-ink: var(--color-charcoal-500);
+  --color-ink-muted: var(--color-charcoal-400);
+  --color-ink-inverse: var(--color-ivory-500);
+  --color-brand-primary: var(--color-navy-500);
+  --color-brand-primary-hover: var(--color-navy-600);
+  --color-brand-accent: var(--color-gold-500);
+  --color-brand-accent-hover: var(--color-gold-600);
+  --color-brand-secondary: var(--color-emerald-500);
+  --color-brand-secondary-hover: var(--color-emerald-600);
+  --color-border-subtle: var(--color-navy-100);
+  --color-border-strong: var(--color-navy-300);
+
+  --font-serif: var(--font-fraunces), 'Iowan Old Style', Georgia, serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --tracking-label: 0.14em;
+
+  --animate-reveal: reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  * {
+    border-color: var(--color-border-subtle);
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
