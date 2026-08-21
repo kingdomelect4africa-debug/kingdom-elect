@@ -3,8 +3,8 @@ import { hashPassword } from '../src/lib/password'
 
 const prisma = new PrismaClient()
 
-const SUPER_ADMIN_EMAIL = 'john.enietan@sagegreytech.com'
-const SUPER_ADMIN_PASSWORD = 'KingdomELECT-2026!'
+const SUPER_ADMIN_EMAIL = 'kingdomelect4africa@gmail.com'
+const SUPER_ADMIN_PASSWORD = 'KingdomELECT(100%)'
 
 async function main() {
   // -------------------------------------------------------------------------
