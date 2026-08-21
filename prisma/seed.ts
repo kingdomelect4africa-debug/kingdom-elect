@@ -459,31 +459,31 @@ async function main() {
       pillars: [
         {
           key: 'EDUCATOR', name: 'Educators',
-          tagline: 'Education shapes culture before culture shapes society.',
+          tagline: 'Shaping minds. Raising solutions.',
           body: "Kingdom Educators are responsible for raising minds, developing character, and producing knowledge that aligns with God's purpose for humanity. They influence curriculum, learning systems, research, policy, and human capital development, ensuring education produces transformational leaders rather than merely graduates.",
           sphereOfInfluence: ['Curriculum', 'Learning systems', 'Research', 'Policy', 'Human capital development'],
         },
         {
           key: 'LEADER', name: 'Leaders',
-          tagline: 'Leadership determines the direction of every institution and nation.',
+          tagline: 'Stewarding influence. Driving change.',
           body: 'Kingdom Leaders are called to steward with integrity, justice, wisdom, and servant leadership. Through strategic influence across the five-fold, they further Kingdom principles and systems that reflect righteousness and alignment to God\'s agenda.',
           sphereOfInfluence: ['Governance', 'Institutional strategy', 'Public policy', 'Church leadership'],
         },
         {
           key: 'ENTREPRENEUR', name: 'Entrepreneurs',
-          tagline: 'Entrepreneurship is the engine of wealth creation and societal innovation.',
+          tagline: 'Building value. Creating opportunities.',
           body: 'Kingdom Entrepreneurs build enterprises that solve real problems, create employment, generate prosperity, and steward economic resources for Kingdom advancement. Their businesses become platforms for transformation rather than merely profit generation.',
           sphereOfInfluence: ['Enterprise', 'Employment', 'Capital stewardship', 'Economic innovation'],
         },
         {
           key: 'CREATIVE', name: 'Creatives',
-          tagline: 'Culture is often won before policy is written.',
+          tagline: 'Shaping culture. Communicating truth.',
           body: "Kingdom Creatives shape imagination, values, and identity through media, arts, storytelling, music, design, entertainment, and communication. They redefine narratives, inspire hope, and present Africa's story through excellence, truth, and beauty.",
           sphereOfInfluence: ['Media', 'Arts', 'Storytelling', 'Design', 'Entertainment'],
         },
         {
           key: 'TECHNOCRAT', name: 'Technocrats',
-          tagline: 'Technology and technical expertise increasingly determine national competitiveness.',
+          tagline: 'Designing systems. Building the future.',
           body: 'Kingdom Technocrats leverage science, engineering, governance, digital innovation, and emerging technologies to solve complex societal problems, improve public systems, and accelerate Africa\'s participation in the global knowledge economy, while maintaining ethical, Kingdom-centred innovation.',
           sphereOfInfluence: ['Science & engineering', 'Digital infrastructure', 'Public systems', 'Emerging technology'],
         },

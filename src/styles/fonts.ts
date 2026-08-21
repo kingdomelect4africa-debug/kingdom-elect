@@ -1,14 +1,13 @@
-import { Fraunces, Inter } from 'next/font/google'
+import { Playfair_Display, Montserrat } from 'next/font/google'
 
-export const fraunces = Fraunces({
+export const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
-  variable: '--font-fraunces',
-  axes: ['opsz', 'SOFT', 'WONK'],
+  variable: '--font-playfair',
   display: 'swap',
 })
 
-export const inter = Inter({
+export const montserrat = Montserrat({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-montserrat',
   display: 'swap',
 })

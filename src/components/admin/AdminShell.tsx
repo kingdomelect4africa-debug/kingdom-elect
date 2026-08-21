@@ -11,7 +11,7 @@ export function AdminShell({ user, children }: { user: SessionUser; children: Re
     <div className="flex min-h-screen bg-navy-50">
       <aside className="hidden w-64 shrink-0 bg-brand-primary lg:block">
         <div className="flex items-center gap-3 px-6 py-6">
-          <LogoMark className="h-7 w-7" color="var(--color-brand-accent)" />
+          <LogoMark className="h-8" />
           <span className="font-serif text-sm text-ink-inverse">Kingdom E.L.E.C.T.</span>
         </div>
         <AdminSidebar accessible={accessible} />

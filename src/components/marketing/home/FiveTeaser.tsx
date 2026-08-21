@@ -10,11 +10,11 @@ import { cn } from '@/lib/cn'
 type Pillar = { key: string; name: string; tagline: string; letter: string }
 
 const PILLARS: Pillar[] = [
-  { key: 'EDUCATOR', name: 'Educators', letter: 'E', tagline: 'Education shapes culture before culture shapes society.' },
-  { key: 'LEADER', name: 'Leaders', letter: 'L', tagline: 'Leadership determines the direction of every institution and nation.' },
-  { key: 'ENTREPRENEUR', name: 'Entrepreneurs', letter: 'E', tagline: 'Entrepreneurship is the engine of wealth creation and societal innovation.' },
-  { key: 'CREATIVE', name: 'Creatives', letter: 'C', tagline: 'Culture is often won before policy is written.' },
-  { key: 'TECHNOCRAT', name: 'Technocrats', letter: 'T', tagline: 'Technology and technical expertise determine national competitiveness.' },
+  { key: 'EDUCATOR', name: 'Educators', letter: 'E', tagline: 'Shaping minds. Raising solutions.' },
+  { key: 'LEADER', name: 'Leaders', letter: 'L', tagline: 'Stewarding influence. Driving change.' },
+  { key: 'ENTREPRENEUR', name: 'Entrepreneurs', letter: 'E', tagline: 'Building value. Creating opportunities.' },
+  { key: 'CREATIVE', name: 'Creatives', letter: 'C', tagline: 'Shaping culture. Communicating truth.' },
+  { key: 'TECHNOCRAT', name: 'Technocrats', letter: 'T', tagline: 'Designing systems. Building the future.' },
 ]
 
 export function FiveTeaser({ heading, intro }: { heading: string; intro: string }) {
