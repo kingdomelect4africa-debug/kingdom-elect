@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
+import { SetNavTone } from '@/components/marketing/NavTone'
 import { EventCard } from '@/components/marketing/EventCard'
 import { formatDate } from '@/lib/format'
 
@@ -40,58 +41,59 @@ export default async function ChapterPage({ params }: { params: Promise<{ countr
   const chapter = await getChapter(country)
   if (!chapter) notFound()
 
+  const infoItems = [
+    chapter.leadPerson && {
+      label: 'Chapter Lead',
+      value: `${chapter.leadPerson.firstName} ${chapter.leadPerson.lastName}`,
+    },
+    { label: 'Members', value: String(chapter._count.members) },
+    chapter.launchDate && { label: 'Launched', value: formatDate(chapter.launchDate) },
+    chapter.contactEmail && { label: 'Contact', value: chapter.contactEmail },
+  ].filter(Boolean) as { label: string; value: string }[]
+
   return (
     <>
-      <section className="bg-brand-primary pb-16 pt-40 text-ink-inverse md:pt-48">
+      <SetNavTone tone="light" />
+
+      <section className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(2.5rem,5vw,3.5rem)]">
         <Container>
-          <Eyebrow>{STATUS_LABELS[chapter.status] ?? chapter.status}</Eyebrow>
-          <h1 className="mt-6 max-w-3xl font-serif text-5xl font-medium leading-[1.05] tracking-tight md:text-6xl">
+          <Kicker>{STATUS_LABELS[chapter.status] ?? chapter.status}</Kicker>
+          <h1 className="mt-4 max-w-[780px] font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
             {chapter.name}
           </h1>
           {chapter.description && (
-            <p className="mt-6 max-w-2xl font-sans text-lg leading-relaxed text-ivory-500/85">{chapter.description}</p>
+            <p className="mt-5 max-w-[560px] font-sans text-[1.05rem] leading-[1.8] text-body">{chapter.description}</p>
           )}
 
-          <div className="mt-10 flex flex-wrap gap-8 border-t border-white/15 pt-8 font-sans text-sm">
-            {chapter.leadPerson && (
-              <div>
-                <p className="text-xs uppercase text-ivory-700" style={{ letterSpacing: '0.06em' }}>Chapter Lead</p>
-                <p className="mt-1 text-ivory-500">
-                  {chapter.leadPerson.firstName} {chapter.leadPerson.lastName}
-                </p>
-              </div>
-            )}
-            <div>
-              <p className="text-xs uppercase text-ivory-700" style={{ letterSpacing: '0.06em' }}>Members</p>
-              <p className="mt-1 text-ivory-500">{chapter._count.members}</p>
+          {infoItems.length > 0 && (
+            <div className="mt-10 flex flex-wrap gap-x-12 gap-y-6 border-t border-line pt-8">
+              {infoItems.map((item) => (
+                <div key={item.label}>
+                  <p className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
+                    {item.label}
+                  </p>
+                  <p className="mt-1 font-serif text-[1.05rem] text-ink">{item.value}</p>
+                </div>
+              ))}
             </div>
-            {chapter.launchDate && (
-              <div>
-                <p className="text-xs uppercase text-ivory-700" style={{ letterSpacing: '0.06em' }}>Launched</p>
-                <p className="mt-1 text-ivory-500">{formatDate(chapter.launchDate)}</p>
-              </div>
-            )}
-            {chapter.contactEmail && (
-              <div>
-                <p className="text-xs uppercase text-ivory-700" style={{ letterSpacing: '0.06em' }}>Contact</p>
-                <p className="mt-1 text-ivory-500">{chapter.contactEmail}</p>
-              </div>
-            )}
-          </div>
+          )}
         </Container>
       </section>
 
-      <section className="bg-surface py-24 md:py-32">
+      <section className="bg-ivory-dim py-[clamp(4.5rem,9vw,8.5rem)]">
         <Container>
-          <h2 className="font-serif text-2xl font-medium text-brand-primary">Chapter Events</h2>
+          <Kicker>Chapter Events</Kicker>
+          <h2 className="mt-4 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-semibold text-ink">
+            Where this chapter gathers.
+          </h2>
           {chapter.events.length > 0 ? (
-            <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8">
               {chapter.events.map((event) => (
                 <EventCard key={event.slug} event={event} />
               ))}
             </div>
           ) : (
-            <p className="mt-8 font-sans text-ink-muted">No chapter events have been published yet.</p>
+            <p className="mt-8 border-t border-line py-8 font-sans text-body">No chapter events have been published yet.</p>
           )}
         </Container>
       </section>

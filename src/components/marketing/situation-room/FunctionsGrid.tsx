@@ -2,34 +2,36 @@
 
 import { motion } from 'motion/react'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
 
 type FunctionItem = { title: string; body: string }
 
 export function FunctionsGrid({ functions }: { functions: FunctionItem[] }) {
   return (
-    <section className="bg-surface py-24 md:py-32">
+    <section className="bg-navy-deep pt-4 pb-[clamp(4.5rem,9vw,8.5rem)] text-ivory">
       <Container>
-        <Eyebrow>What It Functions As</Eyebrow>
-        <h2 className="mt-5 max-w-xl font-serif text-4xl font-medium leading-tight text-brand-primary md:text-5xl">
+        <Kicker onDark>What It Functions As</Kicker>
+        <h2 className="mt-4 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-semibold text-ivory">
           Four functions, one chamber.
         </h2>
 
-        <div className="mt-16 grid gap-px border border-border-subtle bg-border-subtle sm:grid-cols-2">
-          {functions.map((fn, i) => (
-            <motion.div
-              key={fn.title}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-10%' }}
-              transition={{ duration: 0.6, delay: i * 0.08 }}
-              className="bg-surface p-10"
-            >
-              <span className="font-serif text-2xl text-brand-accent">{String(i + 1).padStart(2, '0')}</span>
-              <h3 className="mt-4 font-serif text-2xl font-medium text-brand-primary">{fn.title}</h3>
-              <p className="mt-3 font-sans text-sm leading-relaxed text-ink-muted">{fn.body}</p>
-            </motion.div>
-          ))}
+        <div className="relative mt-10">
+          <div className="grid grid-cols-1 gap-px border border-line-navy bg-line-navy sm:grid-cols-2">
+            {functions.map((fn, i) => (
+              <motion.div
+                key={fn.title}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: '-10%' }}
+                transition={{ duration: 0.6, delay: i * 0.08 }}
+                className="bg-navy p-[2.2rem] transition-colors duration-[0.4s] hover:bg-navy-mid"
+              >
+                <span className="font-serif text-[0.9rem] text-gold-light">{String(i + 1).padStart(2, '0')}</span>
+                <h4 className="mt-[0.9rem] font-serif text-[1.15rem] font-semibold text-ivory">{fn.title}</h4>
+                <p className="mt-[0.6rem] font-sans text-[0.88rem] leading-[1.65] text-body-on-navy">{fn.body}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </Container>
     </section>

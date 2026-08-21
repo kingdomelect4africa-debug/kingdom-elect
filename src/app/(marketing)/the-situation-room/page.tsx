@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
+import { SetNavTone } from '@/components/marketing/NavTone'
 import { SituationRoomHero } from '@/components/marketing/situation-room/SituationRoomHero'
 import { FunctionsGrid } from '@/components/marketing/situation-room/FunctionsGrid'
 import { ExperienceAndOutcomes } from '@/components/marketing/situation-room/ExperienceAndOutcomes'
@@ -39,6 +40,7 @@ export default async function SituationRoomPage() {
 
   return (
     <>
+      <SetNavTone tone="dark" />
       <SituationRoomHero
         heading={content.heroHeading}
         subheading={content.heroSubheading}

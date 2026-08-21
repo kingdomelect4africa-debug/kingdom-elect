@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
+import { Kicker } from '@/components/ui/Section'
+import { SetNavTone } from '@/components/marketing/NavTone'
 import { formatDate } from '@/lib/format'
 
 export const revalidate = 60
@@ -32,22 +34,22 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   if (!article || article.status !== 'PUBLISHED') notFound()
 
   return (
-    <article className="bg-surface pb-24 pt-40 md:pb-32 md:pt-48">
+    <article className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(4.5rem,9vw,8.5rem)]">
+      <SetNavTone tone="light" />
       <Container>
-        <div className="mx-auto max-w-3xl">
-          <p className="font-sans text-xs font-semibold uppercase text-brand-secondary" style={{ letterSpacing: 'var(--tracking-label)' }}>
-            {CATEGORY_LABELS[article.category] ?? article.category}
-          </p>
-          <h1 className="mt-4 font-serif text-4xl font-medium leading-[1.1] tracking-tight text-brand-primary md:text-5xl">
+        <div className="mx-auto max-w-[680px]">
+          <Kicker>{CATEGORY_LABELS[article.category] ?? article.category}</Kicker>
+          <h1 className="mt-4 font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
             {article.title}
           </h1>
-          {article.subtitle && <p className="mt-4 font-sans text-xl text-ink-muted">{article.subtitle}</p>}
+          {article.subtitle && <p className="mt-5 font-sans text-[1.1rem] text-body">{article.subtitle}</p>}
 
-          <div className="mt-6 flex items-center gap-3 border-b border-border-subtle pb-6 font-sans text-xs uppercase text-ink-muted" style={{ letterSpacing: '0.06em' }}>
+          <div
+            className="mt-6 flex flex-wrap items-center gap-3 border-b border-line pb-6 font-sans text-[0.76rem] font-semibold uppercase text-body"
+            style={{ letterSpacing: '0.06em' }}
+          >
             {article.authors.length > 0 && (
-              <span>
-                {article.authors.map((a) => `${a.person.firstName} ${a.person.lastName}`).join(', ')}
-              </span>
+              <span>{article.authors.map((a) => `${a.person.firstName} ${a.person.lastName}`).join(', ')}</span>
             )}
             {article.publishedDate && (
               <>
@@ -57,7 +59,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             )}
           </div>
 
-          <div className="mt-10 whitespace-pre-line font-sans text-lg leading-relaxed text-ink">{article.body}</div>
+          <div className="mt-10 whitespace-pre-line font-sans text-[1.05rem] leading-[1.85] text-body">{article.body}</div>
         </div>
       </Container>
     </article>

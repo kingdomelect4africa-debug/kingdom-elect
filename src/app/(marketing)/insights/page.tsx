@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
-import { ArticleCard } from '@/components/marketing/ArticleCard'
+import { Kicker } from '@/components/ui/Section'
+import { SetNavTone } from '@/components/marketing/NavTone'
+import { CategoryFilterProvider, CategoryPills, FilteredArticleList } from '@/components/marketing/insights/CategoryFilter'
 
 export const revalidate = 60
 
@@ -18,32 +19,36 @@ export default async function InsightsPage() {
     select: { title: true, slug: true, subtitle: true, excerpt: true, category: true, publishedDate: true },
   })
 
+  const categories = Array.from(new Set(articles.map((article) => article.category))).sort()
+
   return (
-    <>
-      <section className="bg-surface pb-16 pt-40 md:pt-48">
+    <CategoryFilterProvider>
+      <SetNavTone tone="light" />
+
+      <header className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(2.5rem,5vw,3.5rem)]">
         <Container>
-          <Eyebrow>Kingdom Intelligence</Eyebrow>
-          <h1 className="mt-6 max-w-2xl font-serif text-5xl font-medium leading-[1.05] tracking-tight text-brand-primary md:text-6xl">
+          <Kicker>Kingdom Intelligence</Kicker>
+          <h1 className="mt-4 max-w-[780px] font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
             Research, briefings, and strategic perspective.
           </h1>
+          <p className="mt-5 max-w-[560px] font-sans text-[1.05rem] text-body">
+            Perspective for those who govern spheres, not just administer functions.
+          </p>
+          {articles.length > 0 && <CategoryPills categories={categories} />}
         </Container>
-      </section>
+      </header>
 
-      <section className="bg-surface pb-24 md:pb-32">
-        <Container wide={false}>
+      <section className="bg-ivory pt-4 pb-[clamp(4.5rem,9vw,8.5rem)]">
+        <Container>
           {articles.length > 0 ? (
-            <div className="mx-auto max-w-3xl">
-              {articles.map((article) => (
-                <ArticleCard key={article.slug} article={article} />
-              ))}
-            </div>
+            <FilteredArticleList articles={articles} />
           ) : (
-            <p className="border border-border-subtle p-10 text-center font-sans text-ink-muted">
+            <p className="border border-dashed border-line-strong p-10 text-center font-sans text-body">
               The intelligence desk is quiet for now — new research and briefings will appear here.
             </p>
           )}
         </Container>
       </section>
-    </>
+    </CategoryFilterProvider>
   )
 }

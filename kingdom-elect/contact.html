@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Kingdom E.L.E.C.T. for Africa</title>
+<meta name="description" content="For urgent matters, reach us directly. Otherwise, use the form and our team will route your message to the right desk.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/kingdom-elect.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M16 7c-3-2-7-2-10 0v17c3-2 7-2 10 0"/><path d="M16 7c3-2 7-2 10 0v17c-3-2-7-2-10 0"/><path d="M16 7v17"/></svg>
+    <div class="brand-text"><div class="n1">Kingdom E.L.E.C.T.</div><div class="n2">FOR AFRICA</div></div>
+  </a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="situation-room.html">The Situation Room</a>
+    <a href="elect.html">E.L.E.C.T.</a>
+    <a href="kingdom-intelligence.html">Kingdom Intelligence</a>
+    <a href="events.html">Events</a>
+    <a href="get-involved.html">Get Involved</a>
+    <a href="contact.html" class="active">Contact</a>
+  </div>
+  <a href="get-involved.html" class="nav-cta">Join / Register</a>
+  <button class="nav-toggle" aria-label="Toggle menu"><span></span></button>
+</nav>
+
+<section class="section-pad">
+  <div class="container contact-grid">
+    <div class="contact-info" data-reveal-group>
+      <span class="kicker" data-reveal="fade">Contact</span>
+      <h1 style="margin-top:1rem; font-size:clamp(2.2rem,4.4vw,3.2rem)" data-reveal>Let's talk.</h1>
+      <p class="lead" data-reveal>For urgent matters, reach us directly using the details below. Otherwise, use the form and our team will route your message to the right desk.</p>
+      <div class="c-item" data-reveal><span class="lbl">Email</span><div class="val">info@kingdomelect.africa</div></div>
+      <div class="c-item" data-reveal><span class="lbl">Phone</span><div class="val">+234 703 347 8378</div></div>
+      <div class="c-item" data-reveal><span class="lbl">Address</span><div class="val">B14, FAFU Homes, Mbora Lifecamp, Abuja, Nigeria</div></div>
+    </div>
+    <div data-reveal-group>
+      <form class="kform" style="margin-top:0" data-reveal>
+        <div class="f-field full">
+          <label>What are you interested in? <span class="req">*</span></label>
+          <select required>
+            <option value="">Select an option</option>
+            <option>General Inquiry</option>
+            <option>Join the Community</option>
+            <option>Become a Fellow</option>
+            <option>Partner With Us</option>
+            <option>Media &amp; Press</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="f-field"><label>Full Name <span class="req">*</span></label><input type="text" required></div>
+        <div class="f-field"><label>Email <span class="req">*</span></label><input type="email" required></div>
+        <div class="f-field"><label>Phone</label><input type="tel"></div>
+        <div class="f-field"><label>Organization</label><input type="text"></div>
+        <div class="f-field full"><label>Message <span class="req">*</span></label><textarea required></textarea></div>
+        <button type="submit" class="submit-btn">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M16 7c-3-2-7-2-10 0v17c3-2 7-2 10 0"/><path d="M16 7c3-2 7-2 10 0v17c-3-2-7-2-10 0"/><path d="M16 7v17"/></svg>
+        <div class="brand-text"><div class="n1">Kingdom E.L.E.C.T.</div><div class="n2">FOR AFRICA</div></div>
+      </div>
+      <p>Kingdom E.L.E.C.T. for Africa mobilizes Educators, Leaders, Entrepreneurs, Creatives, and Technocrats to transform Africa by reforming people, strengthening institutions, and developing territories.</p>
+    </div>
+    <div class="footer-col">
+      <span class="footer-heading">Explore</span>
+      <ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="situation-room.html">The Situation Room</a></li>
+        <li><a href="elect.html">E.L.E.C.T.</a></li>
+        <li><a href="kingdom-intelligence.html">Kingdom Intelligence</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <span class="footer-heading">Participate</span>
+      <ul>
+        <li><a href="get-involved.html">Programs</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="get-involved.html">Get Involved</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <span class="footer-heading">Contact</span>
+      <ul>
+        <li><span>info@kingdomelect.africa</span></li>
+        <li><span>+234 703 347 8378</span></li>
+        <li><span>B14, FAFU Homes, Mbora Lifecamp, Abuja, Nigeria</span></li>
+        <li style="opacity:0.55"><span>Staff Login</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© 2026 Kingdom E.L.E.C.T. for Africa. All rights reserved.</span>
+    <span>Building Influence. Transforming Africa.</span>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+document.querySelector('.kform').addEventListener('submit', (e) => e.preventDefault());
+</script>
+</body>
+</html>

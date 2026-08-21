@@ -1,18 +1,33 @@
+'use client'
+
+import { motion } from 'motion/react'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
-import { RisingForms } from '@/components/devices/RisingForms'
+import { Kicker } from '@/components/ui/Section'
 
 export function AboutHero({ heading, body }: { heading: string; body: string }) {
   return (
-    <section className="relative overflow-hidden bg-surface pb-20 pt-40 md:pb-28 md:pt-48">
-      <RisingForms className="absolute -right-10 top-24 h-64 w-64 text-navy-100" count={5} />
+    <header className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(2.5rem,5vw,3.5rem)]">
       <Container>
-        <Eyebrow>About Kingdom E.L.E.C.T.</Eyebrow>
-        <h1 className="mt-6 max-w-3xl font-serif text-5xl font-medium leading-[1.05] tracking-tight text-brand-primary md:text-6xl">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
+          <Kicker>About Kingdom E.L.E.C.T.</Kicker>
+        </motion.div>
+        <motion.h1
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-4 max-w-[780px] font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] tracking-[-0.01em] text-ink"
+        >
           {heading}
-        </h1>
-        <p className="mt-8 max-w-2xl font-sans text-lg leading-relaxed text-ink-muted md:text-xl">{body}</p>
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-5 max-w-[560px] font-sans text-[1.05rem] leading-[1.6] text-body"
+        >
+          {body}
+        </motion.p>
       </Container>
-    </section>
+    </header>
   )
 }

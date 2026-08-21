@@ -1,92 +1,107 @@
 /*
-  Kingdom E.L.E.C.T. for Africa — brand color tokens.
+  Kingdom E.L.E.C.T. for Africa — design tokens.
 
-  Values match the approved brand book (public/Color Palette.png):
-    navy    = Kingdom Navy   #0D1B2A
-    gold    = Royal Gold     #C9A227
-    emerald = Heritage Green #1B4332
-    ivory   = Kingdom Cream  #F4F1E8
-    charcoal= Stone Gray     #4D4D4D
-  (Token names kept short/generic rather than renamed to the official brand
-  names, since they're internal identifiers only — not shown to visitors.)
+  Palette follows the approved redesign reference (kingdom-elect/css/kingdom-elect.css):
+  navy #0B1F3A, gold #C99218, emerald #123C2A, ivory #F7F3EA, charcoal #252525,
+  plus the redesign's specific named shades (navy-deep/mid/light, gold-light/dark,
+  emerald-light, ivory-dim, ink, body, body-on-navy, faint-on-navy) and low-opacity
+  line colors for hairline borders/rules.
 
   Contrast findings (WCAG 2.1, computed against sRGB relative luminance):
-    gold on ivory   -> 2.14:1  FAILS AA even at large text. Never use gold
-                       as a text color on ivory/cream. Gold is reserved for
-                       icons, borders, rules, large display numerals, and
-                       adequately-sized filled buttons (white/ivory label on
-                       a gold fill passes; gold-on-cream text does not).
-    gold on navy    -> 7.19:1  PASSES AAA for normal text. Gold reads as text
-                       only on navy (or charcoal) backgrounds.
-    navy on ivory   -> 15.40:1 PASSES AAA. Primary body/heading pairing.
-    charcoal/ivory  -> 7.48:1  PASSES AAA.
-    emerald/ivory   -> 9.81:1  PASSES AAA.
+    gold on ivory   -> 2.49:1  FAILS AA even at large text. Never use gold
+                       as a text color on ivory. Reserved for icons, borders,
+                       rules, large display numerals, and filled buttons.
+    gold on navy    -> 5.98:1  PASSES AA for normal text.
+    navy on ivory   -> 14.92:1 PASSES AAA. Primary body/heading pairing.
+    charcoal/ivory  -> 13.84:1 PASSES AAA.
+    emerald/ivory   -> 11.12:1 PASSES AAA.
 */
 
 @theme {
-  /* Raw palette: base + a hand-computed tint (toward white) / shade (toward
-     black) scale per brand color. 500 is always the approved brand hex. */
-  --color-navy-50: #f0f1f2;
-  --color-navy-100: #dddfe1;
-  --color-navy-200: #b6bbbf;
-  --color-navy-300: #8b9299;
-  --color-navy-400: #565f6a;
-  --color-navy-500: #0d1b2a;
-  --color-navy-600: #0b1724;
-  --color-navy-700: #09131d;
-  --color-navy-800: #070f17;
-  --color-navy-900: #050b11;
+  /* Raw scale — kept for the admin CMS, which references specific stops
+     (e.g. navy-50 for subtle surfaces). 500 is always the brand hex. */
+  --color-navy-50: #f0f2f3;
+  --color-navy-100: #dde0e3;
+  --color-navy-200: #b6bcc4;
+  --color-navy-300: #8a93a0;
+  --color-navy-400: #546275;
+  --color-navy-500: #0b1f3a;
+  --color-navy-600: #091a31;
+  --color-navy-700: #081629;
+  --color-navy-800: #061120;
+  --color-navy-900: #040c17;
 
-  --color-gold-50: #fcf9f2;
-  --color-gold-100: #f7f2e1;
-  --color-gold-200: #efe3be;
-  --color-gold-300: #e5d297;
-  --color-gold-400: #d9be68;
-  --color-gold-500: #c9a227;
-  --color-gold-600: #ab8a21;
-  --color-gold-700: #8d711b;
-  --color-gold-800: #6f5915;
-  --color-gold-900: #504110;
+  --color-gold-50: #fcf8f1;
+  --color-gold-100: #f7f0df;
+  --color-gold-200: #efdeba;
+  --color-gold-300: #e5cb90;
+  --color-gold-400: #d9b35d;
+  --color-gold-500: #c99218;
+  --color-gold-600: #ab7c14;
+  --color-gold-700: #8d6611;
+  --color-gold-800: #6f500d;
+  --color-gold-900: #503a0a;
 
-  --color-emerald-50: #f1f4f3;
-  --color-emerald-100: #dfe5e2;
-  --color-emerald-200: #bbc7c2;
-  --color-emerald-300: #92a59d;
-  --color-emerald-400: #5f7b70;
-  --color-emerald-500: #1b4332;
-  --color-emerald-600: #17392b;
-  --color-emerald-700: #132f23;
-  --color-emerald-800: #0f251c;
-  --color-emerald-900: #0b1b14;
+  --color-emerald-50: #f1f3f2;
+  --color-emerald-100: #dee4e1;
+  --color-emerald-200: #b8c5bf;
+  --color-emerald-300: #8da199;
+  --color-emerald-400: #59776a;
+  --color-emerald-500: #123c2a;
+  --color-emerald-600: #0f3324;
+  --color-emerald-700: #0d2a1d;
+  --color-emerald-800: #0a2117;
+  --color-emerald-900: #071811;
 
-  --color-ivory-50: #fefefe;
-  --color-ivory-100: #fdfdfc;
-  --color-ivory-200: #fcfbf8;
-  --color-ivory-300: #faf8f4;
-  --color-ivory-400: #f7f5ef;
-  --color-ivory-500: #f4f1e8;
-  --color-ivory-600: #cfcdc5;
-  --color-ivory-700: #aba9a2;
-  --color-ivory-800: #868580;
-  --color-ivory-900: #62605d;
+  --color-ivory-50: #fffefe;
+  --color-ivory-100: #fefdfc;
+  --color-ivory-200: #fdfbf9;
+  --color-ivory-300: #fbf9f5;
+  --color-ivory-400: #f9f7f0;
+  --color-ivory-500: #f7f3ea;
+  --color-ivory-600: #d2cfc7;
+  --color-ivory-700: #adaaa4;
+  --color-ivory-800: #888681;
+  --color-ivory-900: #63615e;
 
-  --color-charcoal-50: #f4f4f4;
-  --color-charcoal-100: #e6e6e6;
-  --color-charcoal-200: #cacaca;
-  --color-charcoal-300: #aaaaaa;
-  --color-charcoal-400: #828282;
-  --color-charcoal-500: #4d4d4d;
-  --color-charcoal-600: #414141;
-  --color-charcoal-700: #363636;
-  --color-charcoal-800: #2a2a2a;
-  --color-charcoal-900: #1f1f1f;
+  --color-charcoal-50: #f2f2f2;
+  --color-charcoal-100: #e0e0e0;
+  --color-charcoal-200: #bebebe;
+  --color-charcoal-300: #969696;
+  --color-charcoal-400: #666666;
+  --color-charcoal-500: #252525;
+  --color-charcoal-600: #1f1f1f;
+  --color-charcoal-700: #1a1a1a;
+  --color-charcoal-800: #141414;
+  --color-charcoal-900: #0f0f0f;
 
-  /* Semantic aliases — components should reference these, not raw swatches,
-     so a future rebrand or dark variant is a one-file change. */
+  /* Redesign-specific named shades, used directly by the public site */
+  --color-navy: #0b1f3a;
+  --color-navy-deep: #071120;
+  --color-navy-mid: #122b4e;
+  --color-navy-light: #1c3b66;
+  --color-gold: #c99218;
+  --color-gold-light: #e3b94e;
+  --color-gold-dark: #8f6a11;
+  --color-emerald: #123c2a;
+  --color-emerald-light: #1d5940;
+  --color-ivory: #f7f3ea;
+  --color-ivory-dim: #eee7d6;
+  --color-charcoal: #252525;
+  --color-ink: #1a1712;
+  --color-body: #55503f;
+  --color-body-on-navy: #b9c2d6;
+  --color-faint-on-navy: #7c8aa8;
+  --color-line: rgba(37, 29, 15, 0.12);
+  --color-line-strong: rgba(37, 29, 15, 0.22);
+  --color-line-navy: rgba(247, 243, 234, 0.14);
+  --color-line-navy-strong: rgba(247, 243, 234, 0.26);
+
+  /* Semantic aliases — the admin CMS references these, so admin surfaces
+     automatically follow the same palette as the public site. */
   --color-surface: var(--color-ivory-500);
   --color-surface-raised: var(--color-ivory-50);
   --color-surface-inverse: var(--color-navy-500);
-  --color-ink: var(--color-charcoal-500);
   --color-ink-muted: var(--color-charcoal-400);
   --color-ink-inverse: var(--color-ivory-500);
   --color-brand-primary: var(--color-navy-500);
@@ -98,10 +113,13 @@
   --color-border-subtle: var(--color-navy-100);
   --color-border-strong: var(--color-navy-300);
 
-  --font-serif: var(--font-playfair), 'Iowan Old Style', Georgia, serif;
-  --font-sans: var(--font-montserrat), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: var(--font-fraunces), 'Iowan Old Style', Georgia, serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --tracking-label: 0.14em;
+  --ease-signature: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius-sm: 3px;
+  --radius-md: 6px;
 
   --animate-reveal: reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 
@@ -115,6 +133,25 @@
       transform: translateY(0);
     }
   }
+
+  @keyframes bar-rise {
+    from {
+      transform: scaleY(0.86);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes mediashift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
 }
 
 @layer base {
@@ -123,12 +160,17 @@
   }
 
   * {
-    border-color: var(--color-border-subtle);
+    border-color: var(--color-line);
   }
 
   body {
-    background-color: var(--color-surface);
+    background-color: var(--color-ivory);
     color: var(--color-ink);
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-navy-deep);
   }
 
   @media (prefers-reduced-motion: reduce) {

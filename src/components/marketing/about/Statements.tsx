@@ -1,3 +1,6 @@
+'use client'
+
+import { motion } from 'motion/react'
 import { Container } from '@/components/ui/Container'
 
 export function Statements({
@@ -19,20 +22,23 @@ export function Statements({
   ]
 
   return (
-    <section className="bg-brand-primary py-24 text-ink-inverse md:py-32">
-      <Container>
-        <div className="divide-y divide-white/10 border-t border-white/10">
-          {rows.map((row) => (
-            <div key={row.label} className="grid gap-6 py-12 md:grid-cols-12 md:gap-10">
-              <div className="md:col-span-3">
-                <p className="font-sans text-xs font-semibold uppercase text-brand-accent" style={{ letterSpacing: 'var(--tracking-label)' }}>
-                  {row.label}
-                </p>
-              </div>
-              <p className="font-serif text-2xl font-medium leading-snug md:col-span-9 md:text-3xl">{row.text}</p>
-            </div>
-          ))}
-        </div>
+    <section className="bg-navy">
+      <Container className="py-[clamp(2rem,4vw,3rem)]">
+        {rows.map((row, i) => (
+          <motion.div
+            key={row.label}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 0.7, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+            className="grid grid-cols-1 items-baseline gap-[0.6rem] border-t border-line-navy py-[2.1rem] last:border-b lg:grid-cols-[0.28fr_0.72fr] lg:gap-8"
+          >
+            <span className="font-sans text-[0.72rem] font-bold uppercase text-gold-light" style={{ letterSpacing: '0.14em' }}>
+              {row.label}
+            </span>
+            <p className="font-serif text-[clamp(1.05rem,1.8vw,1.35rem)] font-medium leading-[1.5] text-ivory">{row.text}</p>
+          </motion.div>
+        ))}
       </Container>
     </section>
   )

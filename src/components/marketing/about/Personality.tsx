@@ -1,21 +1,28 @@
+'use client'
+
+import { motion } from 'motion/react'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
 
 export function Personality({ traits }: { traits: string[] }) {
   return (
-    <section className="border-t border-border-subtle bg-surface py-24 md:py-32">
-      <Container>
-        <Eyebrow>The Experience</Eyebrow>
-        <p className="mt-8 max-w-4xl font-serif text-3xl font-medium leading-[1.3] text-brand-primary md:text-4xl">
+    <section className="bg-ivory-dim py-[clamp(4.5rem,9vw,8.5rem)]">
+      <Container className="text-center">
+        <Kicker center>The Experience</Kicker>
+        <motion.p
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-10%' }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-6 font-serif text-[clamp(1.3rem,2.8vw,2rem)] font-medium leading-[1.6] text-ink"
+        >
           {traits.map((trait, i) => (
-            <span key={trait}>
-              <span className={i % 3 === 1 ? 'text-brand-accent' : i % 3 === 2 ? 'text-brand-secondary' : undefined}>
-                {trait}
-              </span>
-              {i < traits.length - 1 && <span className="text-ink-muted"> · </span>}
+            <span key={i}>
+              <span className={i % 3 === 1 ? 'italic text-gold-dark' : undefined}>{trait}</span>
+              {i < traits.length - 1 && ' · '}
             </span>
           ))}
-        </p>
+        </motion.p>
       </Container>
     </section>
   )

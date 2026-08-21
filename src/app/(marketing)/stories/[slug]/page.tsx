@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
+import { SetNavTone } from '@/components/marketing/NavTone'
 
 export const revalidate = 60
 
@@ -26,36 +27,47 @@ export default async function StoryDetailPage({ params }: { params: Promise<{ sl
   if (!story || story.status !== 'PUBLISHED') notFound()
 
   return (
-    <article className="bg-surface pb-24 pt-40 md:pb-32 md:pt-48">
+    <article className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(4.5rem,9vw,8.5rem)]">
+      <SetNavTone tone="light" />
       <Container>
-        <div className="mx-auto max-w-3xl">
-          <Eyebrow>
+        <div className="mx-auto max-w-[680px]">
+          <Kicker>
             {story.personFeatured.firstName} {story.personFeatured.lastName}
             {story.personFeatured.title ? ` · ${story.personFeatured.title}` : ''}
-          </Eyebrow>
-          <h1 className="mt-4 font-serif text-4xl font-medium leading-[1.1] tracking-tight text-brand-primary md:text-5xl">
-            {story.title}
-          </h1>
-          <p className="mt-6 font-sans text-xl leading-relaxed text-ink-muted">{story.summary}</p>
+          </Kicker>
+          <h1 className="mt-4 font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">{story.title}</h1>
+          <p className="mt-5 font-sans text-[1.1rem] text-body">{story.summary}</p>
 
-          <div className="mt-10 whitespace-pre-line border-t border-border-subtle pt-10 font-sans text-lg leading-relaxed text-ink">
+          <div className="mt-10 whitespace-pre-line border-t border-line pt-10 font-sans text-[1.05rem] leading-[1.85] text-body">
             {story.body}
           </div>
 
           {(story.relatedProgram || story.relatedEvent || story.relatedChapter) && (
-            <div className="mt-12 flex flex-wrap gap-3 border-t border-border-subtle pt-8">
+            <div className="mt-12 flex flex-wrap gap-3 border-t border-line pt-8">
               {story.relatedProgram && (
-                <a href={`/programs/${story.relatedProgram.slug}`} className="border border-border-strong px-4 py-2 font-sans text-xs uppercase text-brand-primary hover:border-brand-accent">
+                <a
+                  href={`/programs/${story.relatedProgram.slug}`}
+                  className="rounded-[var(--radius-sm)] border border-line-strong px-4 py-2 font-sans text-[0.76rem] font-semibold uppercase text-ink transition-colors hover:border-gold-dark"
+                  style={{ letterSpacing: '0.06em' }}
+                >
                   Program: {story.relatedProgram.title}
                 </a>
               )}
               {story.relatedEvent && (
-                <a href={`/events/${story.relatedEvent.slug}`} className="border border-border-strong px-4 py-2 font-sans text-xs uppercase text-brand-primary hover:border-brand-accent">
+                <a
+                  href={`/events/${story.relatedEvent.slug}`}
+                  className="rounded-[var(--radius-sm)] border border-line-strong px-4 py-2 font-sans text-[0.76rem] font-semibold uppercase text-ink transition-colors hover:border-gold-dark"
+                  style={{ letterSpacing: '0.06em' }}
+                >
                   Event: {story.relatedEvent.title}
                 </a>
               )}
               {story.relatedChapter && (
-                <a href={`/chapters/${story.relatedChapter.slug}`} className="border border-border-strong px-4 py-2 font-sans text-xs uppercase text-brand-primary hover:border-brand-accent">
+                <a
+                  href={`/chapters/${story.relatedChapter.slug}`}
+                  className="rounded-[var(--radius-sm)] border border-line-strong px-4 py-2 font-sans text-[0.76rem] font-semibold uppercase text-ink transition-colors hover:border-gold-dark"
+                  style={{ letterSpacing: '0.06em' }}
+                >
                   Chapter: {story.relatedChapter.name}
                 </a>
               )}

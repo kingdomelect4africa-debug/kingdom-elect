@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
+import { SetNavTone } from '@/components/marketing/NavTone'
 import { InquiryForm } from '@/components/marketing/forms/InquiryForm'
 
 export const metadata: Metadata = {
@@ -24,30 +25,48 @@ export default async function ContactPage() {
 
   return (
     <>
-      <section className="bg-surface pb-16 pt-40 md:pt-48">
-        <Container>
-          <Eyebrow>Contact</Eyebrow>
-          <h1 className="mt-6 max-w-2xl font-serif text-5xl font-medium leading-[1.05] tracking-tight text-brand-primary md:text-6xl">
-            Let&rsquo;s talk.
-          </h1>
-        </Container>
-      </section>
+      <SetNavTone tone="light" />
 
-      <section className="bg-surface pb-24 md:pb-32">
+      <section className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(4.5rem,9vw,8.5rem)]">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-12">
-            <div className="lg:col-span-4">
-              <p className="font-sans text-sm leading-relaxed text-ink-muted">
+          <div className="grid gap-[clamp(2.5rem,6vw,5rem)] lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <Kicker>Contact</Kicker>
+              <h1 className="mt-4 font-serif text-[clamp(2.2rem,4.4vw,3.2rem)] font-semibold leading-[1.12] text-ink">
+                Let&rsquo;s talk.
+              </h1>
+              <p className="mt-6 max-w-[340px] font-sans text-[1.05rem] leading-[1.8] text-body">
                 For urgent matters, reach us directly using the details below. Otherwise, use the form and our team
                 will route your message to the right desk.
               </p>
-              <div className="mt-8 space-y-4 font-sans text-sm text-ink">
-                {settings?.contactEmail && <p>{settings.contactEmail}</p>}
-                {settings?.contactPhone && <p>{settings.contactPhone}</p>}
-                {settings?.address && <p>{settings.address}</p>}
-              </div>
+
+              {settings?.contactEmail && (
+                <div className="mt-7">
+                  <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
+                    Email
+                  </span>
+                  <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.contactEmail}</div>
+                </div>
+              )}
+              {settings?.contactPhone && (
+                <div className="mt-7">
+                  <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
+                    Phone
+                  </span>
+                  <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.contactPhone}</div>
+                </div>
+              )}
+              {settings?.address && (
+                <div className="mt-7">
+                  <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
+                    Address
+                  </span>
+                  <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.address}</div>
+                </div>
+              )}
             </div>
-            <div className="lg:col-span-7 lg:col-start-6">
+
+            <div>
               <InquiryForm typeOptions={CONTACT_OPTIONS} />
             </div>
           </div>

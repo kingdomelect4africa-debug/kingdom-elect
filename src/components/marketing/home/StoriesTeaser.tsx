@@ -1,7 +1,13 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
-import { RisingForms } from '@/components/devices/RisingForms'
+import { Kicker } from '@/components/ui/Section'
+
+const GRADIENTS = [
+  'linear-gradient(140deg, var(--color-navy-deep), var(--color-navy-mid) 55%, var(--color-gold-dark))',
+  'linear-gradient(140deg, var(--color-emerald), var(--color-navy-mid) 60%, var(--color-gold-dark))',
+  'linear-gradient(140deg, var(--color-navy-mid), var(--color-emerald) 55%, var(--color-gold))',
+  'linear-gradient(140deg, var(--color-navy-deep), var(--color-gold-dark) 130%)',
+]
 
 type StoryItem = {
   slug: string
@@ -14,26 +20,30 @@ export function StoriesTeaser({ stories }: { stories: StoryItem[] }) {
   if (stories.length === 0) return null
 
   return (
-    <section className="bg-surface py-24 md:py-32">
+    <section id="stories" className="bg-ivory py-[clamp(4.5rem,9vw,8.5rem)]">
       <Container>
-        <Eyebrow>Stories</Eyebrow>
-        <h2 className="mt-5 max-w-xl font-serif text-4xl font-medium leading-tight text-brand-primary md:text-5xl">
-          Transformation, one person at a time.
-        </h2>
+        <div className="max-w-[560px]">
+          <Kicker>Stories</Kicker>
+          <h2 className="mt-4 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-semibold text-ink">Transformation, one person at a time.</h2>
+        </div>
 
-        <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {stories.map((story) => (
-            <Link key={story.slug} href={`/stories/${story.slug}`} className="group flex flex-col">
-              <div className="relative flex aspect-[4/3] items-end overflow-hidden bg-emerald-900 p-6">
-                <RisingForms className="absolute inset-0 h-full w-full text-white opacity-20" count={4} />
-                <p className="relative font-serif text-xl text-ivory-500">
-                  {story.personFeatured.firstName} {story.personFeatured.lastName}
+        <div className="mt-9 grid gap-7 sm:grid-cols-2">
+          {stories.map((story, i) => (
+            <Link key={story.slug} href={`/stories/${story.slug}`} className="group relative isolate aspect-[4/3] overflow-hidden rounded-[var(--radius-md)]">
+              <div
+                className="absolute inset-0 animate-[mediashift_12s_ease_infinite] bg-[length:220%_220%]"
+                style={{ backgroundImage: GRADIENTS[i % GRADIENTS.length] }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent from-40% to-navy-deep/92" />
+              <div className="absolute inset-x-0 bottom-0 p-[1.6rem]">
+                <span className="font-sans text-[0.68rem] font-bold uppercase text-gold-light" style={{ letterSpacing: '0.1em' }}>
+                  {story.personFeatured.title ?? 'Story'}
+                </span>
+                <h4 className="mt-2 font-serif text-[1.2rem] font-semibold text-ivory">{story.title}</h4>
+                <p className="mt-1 font-sans text-[0.85rem] text-ivory/75">
+                  {story.personFeatured.firstName} {story.personFeatured.lastName} — {story.summary}
                 </p>
               </div>
-              <h3 className="mt-5 font-serif text-xl font-medium leading-snug text-brand-primary transition-colors group-hover:text-brand-accent">
-                {story.title}
-              </h3>
-              <p className="mt-2 font-sans text-sm leading-relaxed text-ink-muted">{story.summary}</p>
             </Link>
           ))}
         </div>

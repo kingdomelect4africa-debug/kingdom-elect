@@ -1,6 +1,7 @@
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
-import { NetworkLines } from '@/components/devices/NetworkLines'
+import { Kicker } from '@/components/ui/Section'
+import { NetworkNodes } from '@/components/devices/NetworkNodes'
 
 export function ParticipationCta({
   heading,
@@ -14,17 +15,16 @@ export function ParticipationCta({
   ctaHref: string
 }) {
   return (
-    <section className="relative overflow-hidden bg-brand-primary py-28 text-ink-inverse md:py-36">
-      <NetworkLines className="absolute inset-0 h-full w-full text-white opacity-40" />
+    <section className="relative overflow-hidden bg-navy-deep py-[clamp(4rem,8vw,6rem)] text-center text-ivory">
+      <NetworkNodes className="absolute inset-0 h-full w-full opacity-55" />
       <Container className="relative">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-serif text-4xl font-medium leading-tight md:text-5xl">{heading}</h2>
-          <p className="mt-6 font-sans text-lg leading-relaxed text-ivory-500/85">{body}</p>
-          <div className="mt-10 flex justify-center">
-            <Button href={ctaHref} variant="gold" size="lg">
-              {ctaLabel}
-            </Button>
-          </div>
+        <Kicker center>Get Involved</Kicker>
+        <h2 className="mx-auto mt-[1.1rem] max-w-[760px] font-serif text-[clamp(2rem,4vw,3.2rem)] font-semibold text-ivory">{heading}</h2>
+        <p className="mx-auto mt-[1.1rem] max-w-[520px] font-sans text-body-on-navy">{body}</p>
+        <div className="mt-8 flex justify-center">
+          <Button href={ctaHref} variant="gold">
+            {ctaLabel}
+          </Button>
         </div>
       </Container>
     </section>

@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
 
 type Stat = { value: string; label: string }
 
@@ -18,48 +18,31 @@ export function DefiningMoment({
   stats: Stat[]
 }) {
   return (
-    <section className="bg-surface py-24 md:py-32">
+    <section className="bg-ivory py-[clamp(4.5rem,9vw,8.5rem)]">
       <Container>
-        <div className="grid gap-16 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-15%' }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-5 font-serif text-4xl font-medium leading-tight text-brand-primary md:text-5xl"
-            >
-              {heading}
-            </motion.h2>
-          </div>
+        <div className="grid gap-[clamp(2rem,5vw,4rem)] lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-10%' }} transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}>
+            {eyebrow && <Kicker>{eyebrow}</Kicker>}
+            <h2 className="mt-4 font-serif text-[clamp(1.6rem,3vw,2.3rem)] font-semibold leading-[1.12] text-ink">{heading}</h2>
+          </motion.div>
 
-          <div className="lg:col-span-6 lg:col-start-7">
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-15%' }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="font-sans text-lg leading-relaxed text-ink md:text-xl"
-            >
-              {body}
-            </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-10%' }}
+            transition={{ duration: 0.9, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="font-sans text-[1.02rem] leading-[1.85] text-body">{body}</p>
 
-            <div className="mt-16 grid grid-cols-1 gap-10 border-t border-border-subtle pt-10 sm:grid-cols-3">
-              {stats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <p className="font-serif text-4xl font-medium text-brand-secondary">{stat.value}</p>
-                  <p className="mt-2 font-sans text-sm leading-snug text-ink-muted">{stat.label}</p>
-                </motion.div>
+            <div className="mt-8 flex flex-col gap-6">
+              {stats.map((stat) => (
+                <div key={stat.label} className="border-t border-line pt-4">
+                  <span className="font-serif text-[2.1rem] font-semibold text-emerald">{stat.value}</span>
+                  <span className="mt-1 block font-sans text-[0.82rem] text-body">{stat.label}</span>
+                </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </Container>
     </section>

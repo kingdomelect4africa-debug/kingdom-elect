@@ -1,100 +1,124 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'motion/react'
 import { Logo } from './Logo'
 import { NAV_ITEMS } from './nav-data'
-import { Button } from '@/components/ui/Button'
+import { useNavTone } from './NavTone'
 import { cn } from '@/lib/cn'
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    setMobileOpen(false)
-  }, [pathname])
+  const tone = useNavTone()
+  const onDark = tone === 'dark' && !mobileOpen
 
   return (
     <header
       className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-all duration-300',
-        scrolled || mobileOpen
-          ? 'bg-surface/95 shadow-[0_1px_0_0_var(--color-border-subtle)] backdrop-blur-sm'
-          : 'bg-transparent',
+        'sticky top-0 z-50 flex items-center justify-between border-b px-[clamp(1.5rem,5vw,4rem)] py-4 backdrop-blur-[10px] transition-colors duration-400',
+        onDark ? 'border-line-navy bg-navy/88' : 'border-line bg-ivory/90',
       )}
     >
-      <div className="mx-auto flex h-20 max-w-[1600px] items-center justify-between px-6 md:px-10 lg:px-16">
-        <Logo tone="dark" />
+      <Logo tone={onDark ? 'dark' : 'light'} />
 
-        <nav className="hidden items-center gap-7 lg:flex">
-          {NAV_ITEMS.map((item) => (
+      <nav className="hidden items-center gap-[1.9rem] lg:flex">
+        {NAV_ITEMS.map((item) => {
+          const active = pathname === item.href
+          return (
             <a
               key={item.href}
               href={item.href}
               className={cn(
-                'font-sans text-[13px] font-medium uppercase text-ink transition-colors hover:text-brand-accent',
-                pathname === item.href && 'text-brand-accent',
+                'relative font-sans text-[0.74rem] font-semibold uppercase transition-colors',
+                onDark ? 'text-body-on-navy hover:text-ivory' : 'text-body hover:text-ink',
+                active && (onDark ? 'text-ivory' : 'text-ink'),
               )}
               style={{ letterSpacing: '0.06em' }}
             >
               {item.label}
+              {active && (
+                <span
+                  className="absolute inset-x-0 -bottom-1.5 h-px bg-gold"
+                  aria-hidden="true"
+                />
+              )}
             </a>
-          ))}
-        </nav>
+          )
+        })}
+      </nav>
 
-        <div className="hidden lg:block">
-          <Button href="/the-situation-room" variant="gold" size="md">
-            Join / Register
-          </Button>
-        </div>
+      <a
+        href="/the-situation-room"
+        className={cn(
+          'hidden rounded-[var(--radius-sm)] px-[1.3rem] py-[0.6rem] font-sans text-[0.72rem] font-semibold uppercase transition-colors lg:inline-block',
+          onDark ? 'bg-gold text-navy-deep hover:bg-gold-light' : 'bg-navy text-ivory hover:bg-gold hover:text-navy-deep',
+        )}
+        style={{ letterSpacing: '0.06em' }}
+      >
+        Join / Register
+      </a>
 
-        <button
-          type="button"
-          onClick={() => setMobileOpen((v) => !v)}
-          className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-        >
-          <span className={cn('h-px w-6 bg-ink transition-transform', mobileOpen && 'translate-y-[3.5px] rotate-45')} />
-          <span className={cn('h-px w-6 bg-ink transition-transform', mobileOpen && '-translate-y-[3.5px] -rotate-45')} />
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => setMobileOpen((v) => !v)}
+        className="flex h-10 w-10 items-center justify-center lg:hidden"
+        aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={mobileOpen}
+      >
+        <span className="relative block h-[1.5px] w-[18px]">
+          <span
+            className={cn(
+              'absolute left-0 top-0 h-[1.5px] w-[18px] transition-transform duration-300',
+              onDark || mobileOpen ? 'bg-ivory' : 'bg-ink',
+              mobileOpen ? 'translate-y-[6px] rotate-45' : '-translate-y-1.5',
+            )}
+          />
+          <span
+            className={cn(
+              'absolute left-0 top-0 h-[1.5px] w-[18px] transition-opacity duration-300',
+              onDark || mobileOpen ? 'bg-ivory' : 'bg-ink',
+              mobileOpen && 'opacity-0',
+            )}
+          />
+          <span
+            className={cn(
+              'absolute left-0 top-0 h-[1.5px] w-[18px] transition-transform duration-300',
+              onDark || mobileOpen ? 'bg-ivory' : 'bg-ink',
+              mobileOpen ? '-translate-y-[6px] -rotate-45' : 'translate-y-1.5',
+            )}
+          />
+        </span>
+      </button>
 
       <AnimatePresence>
         {mobileOpen && (
           <motion.nav
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden bg-surface lg:hidden"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-x-0 top-[66px] bottom-0 z-40 flex flex-col justify-center gap-2 bg-navy-deep p-8 lg:hidden"
           >
-            <div className="flex flex-col gap-1 px-6 pb-8">
-              {NAV_ITEMS.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className="border-b border-border-subtle py-4 font-serif text-lg text-brand-primary"
-                >
-                  {item.label}
-                </a>
-              ))}
-              <div className="pt-6">
-                <Button href="/the-situation-room" variant="gold" size="md" className="w-full">
-                  Join / Register
-                </Button>
-              </div>
-            </div>
+            {NAV_ITEMS.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className="p-3 font-serif text-[1.3rem] text-ivory"
+              >
+                {item.label}
+              </a>
+            ))}
+            <a
+              href="/the-situation-room"
+              onClick={() => setMobileOpen(false)}
+              className="mt-4 inline-block rounded-[var(--radius-sm)] bg-gold px-6 py-3 text-center font-sans text-[0.72rem] font-semibold uppercase text-navy-deep"
+              style={{ letterSpacing: '0.06em' }}
+            >
+              Join / Register
+            </a>
           </motion.nav>
         )}
       </AnimatePresence>

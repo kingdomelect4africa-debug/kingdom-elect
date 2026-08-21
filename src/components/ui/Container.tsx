@@ -12,8 +12,8 @@ export function Container({
   return (
     <div
       className={cn(
-        'mx-auto w-full px-6 md:px-10 lg:px-16',
-        wide ? 'max-w-[1600px]' : 'max-w-[1280px]',
+        'mx-auto w-full px-[clamp(1.5rem,5vw,4rem)]',
+        wide ? 'max-w-[1600px]' : 'max-w-[1240px]',
         className,
       )}
     >

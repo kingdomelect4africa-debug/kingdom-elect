@@ -19,37 +19,48 @@ export function RegistrationPanel({
   } | null
 }) {
   return (
-    <section className="bg-surface py-24 md:py-32">
-      <Container>
-        <div className="mx-auto max-w-3xl border border-border-strong p-10 text-center md:p-16">
-          {event ? (
-            <>
-              <p className="font-sans text-xs font-semibold uppercase text-brand-secondary" style={{ letterSpacing: 'var(--tracking-label)' }}>
-                {formatDateRange(event.startDate, event.endDate)}
-              </p>
-              <h2 className="mt-4 font-serif text-3xl font-medium text-brand-primary md:text-4xl">{event.title}</h2>
-              <p className="mt-3 font-sans text-sm uppercase text-ink-muted" style={{ letterSpacing: '0.06em' }}>
-                {event.isVirtual ? 'Virtual Convening' : [event.venueName, event.venueCity, event.venueCountry].filter(Boolean).join(', ')}
-              </p>
-              <div className="mt-8">
-                <Button href={`/events/${event.slug}`} variant="primary" size="lg">
-                  {event.registrationStatus === 'CLOSED' ? 'Registration Closed' : 'Register for the Situation Room'}
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 className="font-serif text-2xl text-brand-primary">The next convening has not been published yet.</h2>
-              <p className="mt-3 font-sans text-sm text-ink-muted">
-                Sign up for Kingdom Intelligence to be notified the moment registration opens.
-              </p>
-              <div className="mt-8">
-                <Button href="/get-involved" variant="primary" size="lg">
-                  Get Involved
-                </Button>
-              </div>
-            </>
-          )}
+    <section className="bg-ivory-dim py-[clamp(4.5rem,9vw,8.5rem)]">
+      <Container className="max-w-[640px] text-center">
+        <div className="overflow-hidden rounded-[var(--radius-md)] border border-line-strong">
+          <div className="flex flex-col justify-center px-[clamp(2rem,4vw,3rem)] py-[clamp(2rem,4vw,3rem)]">
+            {event ? (
+              <>
+                <span
+                  className="inline-block text-center font-sans text-[0.68rem] font-bold uppercase text-emerald"
+                  style={{ letterSpacing: '0.1em' }}
+                >
+                  {formatDateRange(event.startDate, event.endDate)}
+                </span>
+                <h3 className="mt-[0.6rem] font-serif text-[clamp(1.4rem,2.6vw,1.9rem)] font-semibold text-ink">
+                  {event.title}
+                </h3>
+                <p className="mx-auto mt-4 max-w-[420px] font-sans leading-[1.8] text-body">
+                  {event.isVirtual
+                    ? 'Virtual Convening'
+                    : [event.venueName, event.venueCity, event.venueCountry].filter(Boolean).join(', ')}
+                </p>
+                <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
+                  <Button href={`/events/${event.slug}`} variant="navy">
+                    {event.registrationStatus === 'CLOSED' ? 'Registration Closed' : 'Register for The Situation Room'}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 className="font-serif text-[1.5rem] font-semibold text-ink">
+                  The next convening has not been published yet.
+                </h3>
+                <p className="mx-auto mt-4 max-w-[420px] font-sans leading-[1.8] text-body">
+                  Sign up for Kingdom Intelligence to be notified the moment registration opens.
+                </p>
+                <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
+                  <Button href="/get-involved" variant="navy">
+                    Get Involved
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </Container>
     </section>

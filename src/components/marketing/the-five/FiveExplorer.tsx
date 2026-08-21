@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'motion/react'
 import { cn } from '@/lib/cn'
 
 export type PillarContent = {
@@ -19,6 +18,14 @@ export type PillarRelated = {
   stories: { title: string; slug: string }[]
 }
 
+const LETTERS: Record<string, string> = {
+  EDUCATOR: 'E',
+  LEADER: 'L',
+  ENTREPRENEUR: 'E',
+  CREATIVE: 'C',
+  TECHNOCRAT: 'T',
+}
+
 export function FiveExplorer({
   pillars,
   related,
@@ -31,64 +38,48 @@ export function FiveExplorer({
   const currentRelated = related[current.key] ?? { programs: [], articles: [], stories: [] }
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-2 border-b border-border-subtle">
+    <div className="overflow-hidden rounded-[var(--radius-md)] border border-line">
+      <div className="grid grid-cols-5 border-b border-line">
         {pillars.map((pillar, i) => (
           <button
             key={pillar.key}
             type="button"
             onClick={() => setActive(i)}
             className={cn(
-              'relative px-5 py-4 font-sans text-sm font-medium uppercase transition-colors',
-              active === i ? 'text-brand-primary' : 'text-ink-muted hover:text-brand-primary',
+              'relative border-l border-line px-4 pb-6 pt-8 text-center transition-colors duration-400 first:border-l-0',
+              active === i && 'bg-ivory-dim',
             )}
-            style={{ letterSpacing: '0.06em' }}
           >
-            {pillar.name}
-            {active === i && (
-              <motion.span
-                layoutId="five-underline"
-                className="absolute inset-x-0 -bottom-px h-[2px] bg-brand-accent"
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              />
-            )}
+            <span className={cn('font-serif text-[clamp(2rem,4vw,3.2rem)] font-semibold text-line-strong transition-colors duration-400', active === i && 'text-gold')}>
+              {LETTERS[pillar.key] ?? pillar.name[0]}
+            </span>
+            <span className="mt-[0.6rem] block font-sans text-[0.66rem] font-semibold uppercase text-body" style={{ letterSpacing: '0.1em' }}>
+              {pillar.name}
+            </span>
+            {active === i && <span className="absolute inset-x-0 -bottom-px h-[2px] bg-gold" aria-hidden="true" />}
           </button>
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={current.key}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="grid gap-12 py-14 lg:grid-cols-12"
-        >
-          <div className="lg:col-span-7">
-            <p className="font-serif text-2xl font-medium italic leading-snug text-brand-primary">{current.tagline}</p>
-            <p className="mt-6 font-sans text-base leading-relaxed text-ink-muted">{current.body}</p>
-
-            <div className="mt-8 flex flex-wrap gap-2">
-              {current.sphereOfInfluence.map((sphere) => (
-                <span
-                  key={sphere}
-                  className="border border-border-strong px-3 py-1.5 font-sans text-xs uppercase text-brand-primary"
-                  style={{ letterSpacing: '0.04em' }}
-                >
-                  {sphere}
-                </span>
-              ))}
-            </div>
+      <div className="grid gap-[clamp(2rem,4vw,3rem)] p-[clamp(2rem,4vw,3.5rem)] lg:grid-cols-[1.2fr_0.9fr]">
+        <div>
+          <h3 className="font-serif text-[clamp(1.5rem,2.6vw,2rem)] font-semibold italic text-ink">{current.tagline}</h3>
+          <p className="mt-[1.1rem] font-sans leading-[1.85] text-body">{current.body}</p>
+          <div className="mt-[1.4rem] flex flex-wrap gap-[0.6rem]">
+            {current.sphereOfInfluence.map((sphere) => (
+              <span key={sphere} className="rounded-[var(--radius-sm)] border border-line-strong px-[0.8rem] py-[0.4rem] font-sans text-[0.72rem] uppercase text-body" style={{ letterSpacing: '0.04em' }}>
+                {sphere}
+              </span>
+            ))}
           </div>
+        </div>
 
-          <div className="grid gap-8 lg:col-span-5 lg:grid-cols-1">
-            <RelatedList title="Related Programs" items={currentRelated.programs} basePath="/programs" empty="Programs for this pillar are in development." />
-            <RelatedList title="Kingdom Intelligence" items={currentRelated.articles} basePath="/insights" empty="No intelligence published for this pillar yet." />
-            <RelatedList title="Stories" items={currentRelated.stories} basePath="/stories" empty="No stories published for this pillar yet." />
-          </div>
-        </motion.div>
-      </AnimatePresence>
+        <div>
+          <RelatedList title="Related Programs" items={currentRelated.programs} basePath="/programs" empty="Programs for this pillar are in development." />
+          <RelatedList title="Kingdom Intelligence" items={currentRelated.articles} basePath="/insights" empty="No intelligence published for this pillar yet." />
+          <RelatedList title="Stories" items={currentRelated.stories} basePath="/stories" empty="No stories published for this pillar yet." />
+        </div>
+      </div>
     </div>
   )
 }
@@ -105,22 +96,20 @@ function RelatedList({
   empty: string
 }) {
   return (
-    <div>
-      <p className="font-sans text-xs font-semibold uppercase text-brand-secondary" style={{ letterSpacing: 'var(--tracking-label)' }}>
+    <div className="[&+&]:mt-7">
+      <h5 className="font-sans text-[0.68rem] font-bold uppercase text-emerald" style={{ letterSpacing: '0.1em' }}>
         {title}
-      </p>
+      </h5>
       {items.length > 0 ? (
-        <ul className="mt-3 space-y-2">
+        <div className="mt-[0.8rem]">
           {items.map((item) => (
-            <li key={item.slug}>
-              <Link href={`${basePath}/${item.slug}`} className="font-sans text-sm text-brand-primary underline-offset-4 hover:underline">
-                {item.title}
-              </Link>
-            </li>
+            <Link key={item.slug} href={`${basePath}/${item.slug}`} className="block border-b border-dashed border-line py-2 font-sans text-[0.92rem] text-ink hover:text-gold-dark">
+              {item.title}
+            </Link>
           ))}
-        </ul>
+        </div>
       ) : (
-        <p className="mt-3 font-sans text-sm text-ink-muted">{empty}</p>
+        <p className="mt-[0.8rem] font-sans text-[0.85rem] text-body">{empty}</p>
       )}
     </div>
   )

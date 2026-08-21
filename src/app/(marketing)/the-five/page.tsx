@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
+import { SetNavTone } from '@/components/marketing/NavTone'
 import { FiveExplorer, type PillarContent, type PillarRelated } from '@/components/marketing/the-five/FiveExplorer'
 import type { PillarTag } from '@prisma/client'
 
@@ -20,7 +21,7 @@ export default async function TheFivePage() {
   if (!content) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-6 text-center">
-        <p className="font-sans text-ink-muted">The Five content has not been configured yet.</p>
+        <p className="font-sans text-body">The Five content has not been configured yet.</p>
       </div>
     )
   }
@@ -50,17 +51,18 @@ export default async function TheFivePage() {
 
   return (
     <>
-      <section className="bg-surface pb-16 pt-40 md:pt-48">
+      <SetNavTone tone="light" />
+      <section className="bg-ivory pb-4 pt-[clamp(3.5rem,8vw,5.5rem)]">
         <Container>
-          <Eyebrow>Collective Influence</Eyebrow>
-          <h1 className="mt-6 max-w-3xl font-serif text-5xl font-medium leading-[1.05] tracking-tight text-brand-primary md:text-6xl">
+          <Kicker>Collective Influence</Kicker>
+          <h1 className="mt-4 max-w-3xl font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
             {content.heading}
           </h1>
-          <p className="mt-8 max-w-2xl font-sans text-lg leading-relaxed text-ink-muted md:text-xl">{content.intro}</p>
+          <p className="mt-5 max-w-[560px] font-sans text-[1.05rem] leading-[1.8] text-body">{content.intro}</p>
         </Container>
       </section>
 
-      <section className="bg-surface pb-24 md:pb-32">
+      <section className="bg-ivory py-[clamp(4.5rem,9vw,8.5rem)] pt-4">
         <Container>
           <FiveExplorer pillars={pillars} related={related} />
         </Container>

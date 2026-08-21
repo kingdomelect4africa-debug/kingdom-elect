@@ -31,7 +31,7 @@ export function RegistrationForm({ eventSlug, fields }: { eventSlug: string; fie
         <p className="border border-gold-600 bg-gold-50 px-4 py-3 font-sans text-sm text-gold-800">{state.message}</p>
       )}
 
-      <Button type="submit" variant="primary" size="lg" disabled={isPending} className="mt-2">
+      <Button type="submit" variant="navy" disabled={isPending} className="mt-2 w-full">
         {isPending ? 'Submitting…' : 'Complete Registration'}
       </Button>
     </form>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
+import { SetNavTone } from '@/components/marketing/NavTone'
 import { AboutHero } from '@/components/marketing/about/AboutHero'
 import { StoryAcronym } from '@/components/marketing/about/StoryAcronym'
 import { Statements } from '@/components/marketing/about/Statements'
@@ -29,6 +30,7 @@ export default async function AboutPage() {
 
   return (
     <>
+      <SetNavTone tone="light" />
       <AboutHero heading={content.heroHeading} body={content.heroBody} />
       <StoryAcronym heading={content.storyHeading} body={content.storyBody} />
       <Statements

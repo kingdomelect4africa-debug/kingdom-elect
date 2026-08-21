@@ -1,25 +1,23 @@
 import Link from 'next/link'
 import { cn } from '@/lib/cn'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'gold'
-type Size = 'md' | 'lg'
+type Variant = 'gold' | 'navy' | 'line' | 'line-navy'
+type Size = 'md' | 'sm'
 
 const variantClasses: Record<Variant, string> = {
-  primary:
-    'bg-brand-primary text-ink-inverse hover:bg-navy-600 focus-visible:outline-navy-500',
-  secondary:
-    'bg-transparent text-brand-primary border border-border-strong hover:bg-navy-50 focus-visible:outline-navy-500',
-  ghost: 'bg-transparent text-ink-inverse border border-white/30 hover:bg-white/10 focus-visible:outline-white',
-  gold: 'bg-brand-accent text-navy-900 hover:bg-gold-600 focus-visible:outline-gold-600',
+  gold: 'bg-gold text-navy-deep hover:bg-gold-light',
+  navy: 'bg-navy text-ivory hover:bg-navy-light',
+  line: 'border border-line-strong text-ink hover:border-ink',
+  'line-navy': 'border border-line-navy-strong text-ivory hover:border-ivory',
 }
 
 const sizeClasses: Record<Size, string> = {
-  md: 'px-6 py-3 text-sm',
-  lg: 'px-8 py-4 text-base',
+  md: 'px-7 py-[0.95rem] text-[0.8rem]',
+  sm: 'px-5 py-[0.65rem] text-[0.72rem]',
 }
 
 const baseClasses =
-  'inline-flex items-center justify-center gap-2 rounded-none font-sans font-semibold uppercase tracking-wide transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-40 disabled:pointer-events-none'
+  'inline-flex items-center justify-center gap-2 rounded-[var(--radius-sm)] font-sans font-semibold uppercase tracking-[0.06em] whitespace-nowrap transition-[background,color,border-color,transform] duration-300 ease-[var(--ease-signature)] hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-40 disabled:pointer-events-none'
 
 type ButtonProps = {
   children: React.ReactNode
@@ -31,7 +29,7 @@ type ButtonProps = {
   | ({ href?: undefined } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'>)
 )
 
-export function Button({ children, variant = 'primary', size = 'md', className, ...props }: ButtonProps) {
+export function Button({ children, variant = 'navy', size = 'md', className, ...props }: ButtonProps) {
   const classes = cn(baseClasses, variantClasses[variant], sizeClasses[size], className)
 
   if ('href' in props && props.href) {

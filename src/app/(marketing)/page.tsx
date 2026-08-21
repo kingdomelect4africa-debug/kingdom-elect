@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db'
+import { SetNavTone } from '@/components/marketing/NavTone'
 import { Hero } from '@/components/marketing/home/Hero'
 import { DefiningMoment } from '@/components/marketing/home/DefiningMoment'
 import { KingdomFramework } from '@/components/marketing/home/KingdomFramework'
@@ -9,13 +10,18 @@ import { ProgramsEventsTeaser } from '@/components/marketing/home/ProgramsEvents
 import { PartnersWall } from '@/components/marketing/home/PartnersWall'
 import { StoriesTeaser } from '@/components/marketing/home/StoriesTeaser'
 import { ParticipationCta } from '@/components/marketing/home/ParticipationCta'
+import type { PillarContent, PillarRelated } from '@/components/marketing/the-five/FiveExplorer'
+import type { PillarTag } from '@prisma/client'
 
 export const revalidate = 60
 
+const PILLAR_KEYS: PillarTag[] = ['EDUCATOR', 'LEADER', 'ENTREPRENEUR', 'CREATIVE', 'TECHNOCRAT']
+
 export default async function HomePage() {
-  const [content, featuredEvent, upcomingEvents, featuredPrograms, featuredArticles, featuredPartners, featuredStories] =
+  const [content, fiveContent, featuredEvent, upcomingEvents, featuredPrograms, featuredArticles, featuredPartners, featuredStories] =
     await Promise.all([
       prisma.homePageContent.findUnique({ where: { id: 1 } }),
+      prisma.theFivePageContent.findUnique({ where: { id: 1 } }),
       prisma.event.findFirst({
         where: { status: 'PUBLISHED', endDate: { gte: new Date() } },
         orderBy: { startDate: 'asc' },
@@ -68,9 +74,31 @@ export default async function HomePage() {
 
   const momentStats = (content.momentStats as { value: string; label: string }[]) ?? []
   const frameworkSteps = (content.frameworkSteps as { label: string; description: string }[]) ?? []
+  const pillars = (fiveContent?.pillars as PillarContent[] | undefined) ?? []
+
+  const relatedEntries = await Promise.all(
+    PILLAR_KEYS.map(async (key) => {
+      const [programs, articles, stories] = await Promise.all([
+        prisma.program.findMany({ where: { pillarTags: { has: key } }, take: 3, select: { title: true, slug: true } }),
+        prisma.article.findMany({
+          where: { pillarTags: { has: key }, status: 'PUBLISHED' },
+          take: 3,
+          select: { title: true, slug: true },
+        }),
+        prisma.story.findMany({
+          where: { status: 'PUBLISHED', personFeatured: { pillarTags: { has: key } } },
+          take: 3,
+          select: { title: true, slug: true },
+        }),
+      ])
+      return [key, { programs, articles, stories }] as const
+    }),
+  )
+  const related = Object.fromEntries(relatedEntries) as Record<string, PillarRelated>
 
   return (
     <>
+      <SetNavTone tone="dark" />
       <Hero
         eyebrow={content.heroEyebrow}
         heading={content.heroHeading}
@@ -87,9 +115,9 @@ export default async function HomePage() {
         stats={momentStats}
       />
       <KingdomFramework heading={content.frameworkHeading} intro={content.frameworkIntro} steps={frameworkSteps} />
-      <FiveTeaser heading={content.fiveHeading} intro={content.fiveIntro} />
+      <FiveTeaser heading={content.fiveHeading} intro={content.fiveIntro} pillars={pillars} related={related} />
       <SituationRoomTeaser heading={content.situationRoomHeading} body={content.situationRoomBody} event={featuredEvent} />
-      <IntelligenceTeaser heading={content.intelligenceHeading} intro={content.intelligenceIntro} articles={featuredArticles} />
+      <IntelligenceTeaser heading={content.intelligenceHeading} articles={featuredArticles} />
       <ProgramsEventsTeaser programs={featuredPrograms} events={upcomingEvents} />
       <PartnersWall partners={featuredPartners} />
       <StoriesTeaser stories={featuredStories} />

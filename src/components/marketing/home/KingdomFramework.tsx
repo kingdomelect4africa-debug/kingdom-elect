@@ -1,8 +1,9 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
+import { cn } from '@/lib/cn'
 
 type Step = { label: string; description: string }
 
@@ -15,56 +16,75 @@ export function KingdomFramework({
   intro: string
   steps: Step[]
 }) {
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([])
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          const idx = stepRefs.current.findIndex((el) => el === entry.target)
+          if (idx !== -1) setActiveIndex(idx)
+        })
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+    )
+    stepRefs.current.forEach((el) => el && observer.observe(el))
+    return () => observer.disconnect()
+  }, [steps.length])
+
   return (
-    <section className="relative overflow-hidden bg-brand-primary py-24 text-ink-inverse md:py-32">
+    <section className="bg-navy py-[clamp(4.5rem,9vw,8.5rem)] text-ivory">
       <Container>
-        <div className="max-w-2xl">
-          <Eyebrow>The Kingdom Framework</Eyebrow>
-          <h2 className="mt-5 font-serif text-4xl font-medium leading-tight md:text-5xl">{heading}</h2>
-          <p className="mt-6 font-sans text-lg leading-relaxed text-ivory-500/85">{intro}</p>
-        </div>
+        <div className="grid gap-[clamp(2rem,6vw,5rem)] lg:grid-cols-[0.85fr_1.15fr]">
+          <div className="lg:sticky lg:top-28 lg:h-fit lg:self-start">
+            <Kicker onDark>The Kingdom Principle</Kicker>
+            <h2 className="mt-4 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-semibold text-ivory">{heading}</h2>
+            <p className="mt-4 max-w-[380px] font-sans leading-[1.8] text-body-on-navy">{intro}</p>
 
-        <div className="relative mt-20">
-          <svg
-            viewBox="0 0 1000 4"
-            preserveAspectRatio="none"
-            className="absolute left-0 top-[22px] hidden h-px w-full lg:block"
-          >
-            <motion.line
-              x1={20}
-              y1={2}
-              x2={980}
-              y2={2}
-              stroke="var(--color-brand-accent)"
-              strokeWidth={2}
-              initial={{ pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true, margin: '-20%' }}
-              transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-            />
-          </svg>
-
-          <div className="grid gap-10 lg:grid-cols-5 lg:gap-6">
-            {steps.map((step, i) => (
-              <motion.div
-                key={step.label}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-15%' }}
-                transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                className="relative"
-              >
-                <div className="flex items-center gap-3 lg:flex-col lg:items-start lg:gap-5">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-brand-accent font-serif text-lg text-brand-accent">
-                    {i + 1}
+            {/* Mobile: horizontal scroll chain, no connecting line */}
+            <div className="mt-10 flex gap-6 overflow-x-auto pb-1 lg:hidden">
+              {steps.map((step, i) => (
+                <div key={step.label} className="flex flex-none flex-col items-start gap-[0.6rem]">
+                  <span className={cn('h-[21px] w-[21px] rounded-full border-[1.5px] border-line-navy-strong bg-navy transition-colors duration-500', i <= activeIndex && 'border-gold bg-gold')} />
+                  <span className={cn('whitespace-nowrap font-serif text-[0.85rem] font-medium text-faint-on-navy transition-colors duration-500', i === activeIndex && 'text-gold-light', i < activeIndex && 'text-ivory')}>
+                    {step.label}
                   </span>
-                  <h3 className="font-serif text-xl font-medium">{step.label}</h3>
                 </div>
-                <p className="mt-4 font-sans text-sm leading-relaxed text-ivory-500/75">{step.description}</p>
-                {i < steps.length - 1 && (
-                  <span className="mt-6 block h-px w-10 bg-white/15 lg:hidden" aria-hidden="true" />
-                )}
-              </motion.div>
+              ))}
+            </div>
+
+            {/* Desktop: vertical chain with an animated progress line */}
+            <div className="relative mt-10 hidden flex-col lg:flex">
+              <span className="absolute left-[10px] top-[22px] bottom-[22px] w-px bg-line-navy" aria-hidden="true" />
+              <span
+                className="absolute left-[10px] top-[22px] w-px origin-top bg-gold transition-[height] duration-500 ease-[var(--ease-signature)]"
+                style={{ height: `calc((100% - 44px) * ${steps.length > 1 ? activeIndex / (steps.length - 1) : 0})` }}
+                aria-hidden="true"
+              />
+              {steps.map((step, i) => (
+                <div key={step.label} className="relative z-[1] flex items-center gap-[1.1rem] pb-10 last:pb-0">
+                  <span className={cn('h-[21px] w-[21px] shrink-0 rounded-full border-[1.5px] border-line-navy-strong bg-navy transition-colors duration-500', i <= activeIndex && 'border-gold bg-gold')} />
+                  <span className={cn('font-serif text-[1.15rem] font-medium text-faint-on-navy transition-colors duration-500', i === activeIndex && 'text-gold-light', i < activeIndex && 'text-ivory')}>
+                    {step.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col">
+            {steps.map((step, i) => (
+              <div
+                key={step.label}
+                ref={(el) => { stepRefs.current[i] = el }}
+                className="flex min-h-[62vh] flex-col justify-center border-t border-line-navy py-12 first:border-t-0"
+              >
+                <span className="font-serif text-[0.85rem] text-gold-light">{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="mt-[0.9rem] font-serif text-[clamp(1.6rem,3vw,2.4rem)] font-semibold text-ivory">{step.label}</h3>
+                <p className="mt-[1.1rem] max-w-[520px] font-sans text-[1.02rem] leading-[1.85] text-body-on-navy">{step.description}</p>
+              </div>
             ))}
           </div>
         </div>

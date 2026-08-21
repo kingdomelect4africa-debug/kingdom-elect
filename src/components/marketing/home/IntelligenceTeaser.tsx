@@ -1,44 +1,34 @@
-import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker, LinkArrow } from '@/components/ui/Section'
 import { ArticleCard } from '@/components/marketing/ArticleCard'
 import type { Article } from '@prisma/client'
 
 export function IntelligenceTeaser({
   heading,
-  intro,
   articles,
 }: {
   heading: string
-  intro: string
   articles: Pick<Article, 'title' | 'slug' | 'subtitle' | 'excerpt' | 'category' | 'publishedDate'>[]
 }) {
   return (
-    <section className="bg-surface py-24 md:py-32">
+    <section className="bg-ivory py-[clamp(4.5rem,9vw,8.5rem)]">
       <Container>
-        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-xl">
-            <Eyebrow>Kingdom Intelligence</Eyebrow>
-            <h2 className="mt-5 font-serif text-4xl font-medium leading-tight text-brand-primary md:text-5xl">{heading}</h2>
-            <p className="mt-6 font-sans text-lg leading-relaxed text-ink-muted">{intro}</p>
+        <div className="flex flex-wrap items-baseline justify-between gap-4">
+          <div>
+            <Kicker>Kingdom Intelligence</Kicker>
+            <h2 className="mt-4 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-semibold text-ink">{heading}</h2>
           </div>
-          <Link
-            href="/insights"
-            className="shrink-0 font-sans text-sm font-semibold uppercase text-brand-primary underline-offset-4 hover:underline"
-            style={{ letterSpacing: 'var(--tracking-label)' }}
-          >
-            View all intelligence →
-          </Link>
+          <LinkArrow href="/insights">View all intelligence</LinkArrow>
         </div>
 
         {articles.length > 0 ? (
-          <div className="mt-14">
+          <div className="mt-8">
             {articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} />
+              <ArticleCard key={article.slug} article={article} showCategory />
             ))}
           </div>
         ) : (
-          <p className="mt-14 border-t border-border-subtle pt-8 font-sans text-ink-muted">
+          <p className="mt-8 border-t border-line py-8 font-sans text-body">
             The intelligence desk is quiet for now — new research and briefings will appear here.
           </p>
         )}

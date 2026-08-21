@@ -1,5 +1,5 @@
 import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Section'
+import { Kicker } from '@/components/ui/Section'
 
 export function ExperienceAndOutcomes({
   sessionTypes,
@@ -9,36 +9,45 @@ export function ExperienceAndOutcomes({
   outcomes: string[]
 }) {
   return (
-    <section className="bg-brand-primary py-24 text-ink-inverse md:py-32">
+    <section className="bg-navy-deep py-[clamp(3rem,6vw,5rem)] text-ivory">
       <Container>
-        <div className="grid gap-16 lg:grid-cols-2">
+        <div className="grid gap-[clamp(2rem,5vw,4rem)] lg:grid-cols-2">
           <div>
-            <Eyebrow>The Experience</Eyebrow>
-            <h2 className="mt-5 font-serif text-3xl font-medium leading-tight md:text-4xl">
+            <Kicker onDark>The Experience</Kicker>
+            <h2 className="mt-4 font-serif text-[clamp(1.5rem,2.6vw,2rem)] font-semibold text-ivory">
               Beyond the conventional conference.
             </h2>
-            <ol className="mt-10 divide-y divide-white/10 border-t border-white/10">
+            <ol className="mt-6 flex flex-col">
               {sessionTypes.map((type, i) => (
-                <li key={type} className="flex items-baseline gap-4 py-4">
-                  <span className="font-serif text-sm text-brand-accent">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="font-sans text-base text-ivory-500/90">{type}</span>
+                <li
+                  key={type}
+                  className="flex gap-4 border-t border-line-navy py-[0.9rem] font-sans text-[0.95rem] text-body-on-navy first:border-t-0"
+                >
+                  <span className="w-[1.6rem] flex-none font-serif text-[0.8rem] text-gold-light">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  {type}
                 </li>
               ))}
             </ol>
           </div>
 
           <div>
-            <Eyebrow>Expected Outcomes</Eyebrow>
-            <h2 className="mt-5 font-serif text-3xl font-medium leading-tight md:text-4xl">
+            <Kicker onDark>Expected Outcomes</Kicker>
+            <h2 className="mt-4 font-serif text-[clamp(1.5rem,2.6vw,2rem)] font-semibold text-ivory">
               What the chamber produces.
             </h2>
-            <ul className="mt-10 divide-y divide-white/10 border-t border-white/10">
+            <ol className="mt-6 flex flex-col">
               {outcomes.map((outcome) => (
-                <li key={outcome} className="py-4 font-sans text-base leading-relaxed text-ivory-500/90">
+                <li
+                  key={outcome}
+                  className="flex gap-4 border-t border-line-navy py-[0.9rem] font-sans text-[0.95rem] text-body-on-navy first:border-t-0"
+                >
+                  <span className="w-[1.6rem] flex-none font-serif text-[0.8rem] text-gold-light">·</span>
                   {outcome}
                 </li>
               ))}
-            </ul>
+            </ol>
           </div>
         </div>
       </Container>
