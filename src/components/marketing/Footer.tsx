@@ -4,7 +4,11 @@ import { Logo } from './Logo'
 import { RadiatingLines } from '@/components/devices/RadiatingLines'
 
 export async function Footer() {
-  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } })
+  // Falls back to defaults rather than throwing: the footer renders on
+  // every page (including static builds like /_not-found), so a database
+  // being unreachable at build/request time should degrade gracefully
+  // instead of failing the page — or the whole build — outright.
+  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } }).catch(() => null)
 
   return (
     <footer className="relative overflow-hidden bg-brand-primary text-ink-inverse">
