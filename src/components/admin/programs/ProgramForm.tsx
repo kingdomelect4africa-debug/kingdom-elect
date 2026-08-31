@@ -51,7 +51,7 @@ export function ProgramForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Management &amp; Status</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Status" htmlFor="status" required>
             <select id="status" name="status" required defaultValue={program?.status ?? 'ONGOING'} className={inputClasses}>
               {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}

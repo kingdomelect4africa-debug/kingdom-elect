@@ -39,7 +39,7 @@ export function PartnershipForm({
             {organizations.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
           </select>
         </Field>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Type" htmlFor="type" required>
             <select id="type" name="type" required defaultValue={partnership?.type ?? 'STRATEGIC'} className={inputClasses}>
               {TYPE_OPTIONS.map((t) => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
@@ -56,7 +56,7 @@ export function PartnershipForm({
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Relates To</legend>
         <p className="font-sans text-xs text-ink-muted">Optional — link this partnership to whichever program, event, or chapter it supports.</p>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Field label="Program" htmlFor="relatedProgramId">
             <select id="relatedProgramId" name="relatedProgramId" defaultValue={partnership?.relatedProgramId ?? ''} className={inputClasses}>
               <option value="">None</option>
@@ -80,7 +80,7 @@ export function PartnershipForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Term &amp; Contact</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Start Date" htmlFor="startDate">
             <input id="startDate" name="startDate" type="date" defaultValue={toDateInputValue(partnership?.startDate)} className={inputClasses} />
           </Field>

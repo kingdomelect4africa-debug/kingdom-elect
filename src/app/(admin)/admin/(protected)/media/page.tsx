@@ -29,7 +29,7 @@ export default async function MediaPage({
         <Field label="Alt Text" htmlFor="alt" required hint="Describes the file for accessibility and SEO.">
           <input id="alt" name="alt" required className={inputClasses} />
         </Field>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Caption" htmlFor="caption">
             <input id="caption" name="caption" className={inputClasses} />
           </Field>

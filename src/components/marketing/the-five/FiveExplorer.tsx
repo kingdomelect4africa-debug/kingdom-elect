@@ -46,7 +46,7 @@ export function FiveExplorer({
             type="button"
             onClick={() => setActive(i)}
             className={cn(
-              'relative border-l border-line px-4 pb-6 pt-8 text-center transition-colors duration-400 first:border-l-0',
+              'relative border-l border-line px-1 pb-4 pt-6 text-center transition-colors duration-400 first:border-l-0 sm:px-4 sm:pb-6 sm:pt-8',
               active === i && 'bg-ivory-dim',
             )}
           >

@@ -26,7 +26,7 @@ export default async function HomePageEditor({ searchParams }: { searchParams: P
           <Field label="Subheading" htmlFor="heroSubheading" required>
             <textarea id="heroSubheading" name="heroSubheading" required defaultValue={content.heroSubheading} rows={3} className={inputClasses} />
           </Field>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Primary CTA Label" htmlFor="heroPrimaryCtaLabel" required>
               <input id="heroPrimaryCtaLabel" name="heroPrimaryCtaLabel" required defaultValue={content.heroPrimaryCtaLabel} className={inputClasses} />
             </Field>
@@ -55,7 +55,7 @@ export default async function HomePageEditor({ searchParams }: { searchParams: P
           </Field>
           <p className="font-sans text-xs font-semibold uppercase text-ink-muted" style={{ letterSpacing: '0.06em' }}>Stat Points</p>
           {[0, 1, 2].map((i) => (
-            <div key={i} className="grid grid-cols-[120px_1fr] gap-4">
+            <div key={i} className="grid grid-cols-1 gap-4 sm:grid-cols-[120px_1fr]">
               <Field label={`Stat ${i + 1} Value`} htmlFor={`momentStats.${i}.value`}>
                 <input id={`momentStats.${i}.value`} name={`momentStats.${i}.value`} defaultValue={momentStats[i]?.value ?? ''} className={inputClasses} />
               </Field>
@@ -75,7 +75,7 @@ export default async function HomePageEditor({ searchParams }: { searchParams: P
             <textarea id="frameworkIntro" name="frameworkIntro" required defaultValue={content.frameworkIntro} rows={2} className={inputClasses} />
           </Field>
           {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className="grid grid-cols-[160px_1fr] gap-4">
+            <div key={i} className="grid grid-cols-1 gap-4 sm:grid-cols-[160px_1fr]">
               <Field label={`Step ${i + 1} Label`} htmlFor={`frameworkSteps.${i}.label`}>
                 <input id={`frameworkSteps.${i}.label`} name={`frameworkSteps.${i}.label`} defaultValue={frameworkSteps[i]?.label ?? ''} className={inputClasses} />
               </Field>
@@ -116,7 +116,7 @@ export default async function HomePageEditor({ searchParams }: { searchParams: P
           <Field label="Body" htmlFor="participationBody" required>
             <textarea id="participationBody" name="participationBody" required defaultValue={content.participationBody} rows={2} className={inputClasses} />
           </Field>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="CTA Label" htmlFor="participationCtaLabel" required>
               <input id="participationCtaLabel" name="participationCtaLabel" required defaultValue={content.participationCtaLabel} className={inputClasses} />
             </Field>

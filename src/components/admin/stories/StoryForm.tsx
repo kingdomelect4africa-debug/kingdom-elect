@@ -52,7 +52,7 @@ export function StoryForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Relations</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Related Chapter" htmlFor="relatedChapterId">
             <select id="relatedChapterId" name="relatedChapterId" defaultValue={story?.relatedChapterId ?? ''} className={inputClasses}>
               <option value="">None</option>
@@ -76,7 +76,7 @@ export function StoryForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Publishing</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Published Date" htmlFor="publishedDate">
             <input id="publishedDate" name="publishedDate" type="date" defaultValue={toDateInputValue(story?.publishedDate)} className={inputClasses} />
           </Field>

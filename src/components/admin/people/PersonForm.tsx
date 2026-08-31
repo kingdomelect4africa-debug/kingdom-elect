@@ -22,7 +22,7 @@ export function PersonForm({
     <form action={action} className="flex max-w-3xl flex-col gap-8">
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Identity</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="First Name" htmlFor="firstName" required>
             <input id="firstName" name="firstName" required defaultValue={person?.firstName} className={inputClasses} />
           </Field>
@@ -43,7 +43,7 @@ export function PersonForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Affiliation &amp; Location</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Organization" htmlFor="organizationId" hint="Optional — the institution this person is associated with.">
             <select id="organizationId" name="organizationId" defaultValue={person?.organizationId ?? ''} className={inputClasses}>
               <option value="">None</option>
@@ -89,7 +89,7 @@ export function PersonForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Contact &amp; Publishing</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Email" htmlFor="email" hint="Must be unique across all people.">
             <input id="email" name="email" type="email" defaultValue={person?.email ?? ''} className={inputClasses} />
           </Field>

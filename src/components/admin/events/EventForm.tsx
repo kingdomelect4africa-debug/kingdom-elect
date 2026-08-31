@@ -31,7 +31,7 @@ export function EventForm({
         <Field label="Slug" htmlFor="slug" hint="Leave blank to generate from the title.">
           <input id="slug" name="slug" defaultValue={event?.slug} className={inputClasses} />
         </Field>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Type" htmlFor="type" required>
             <select id="type" name="type" required defaultValue={event?.type ?? 'SITUATION_ROOM'} className={inputClasses}>
               {TYPE_OPTIONS.map((t) => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
@@ -54,7 +54,7 @@ export function EventForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">When &amp; Where</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Start" htmlFor="startDate" required>
             <input id="startDate" name="startDate" type="datetime-local" required defaultValue={toDateTimeLocal(event?.startDate)} className={inputClasses} />
           </Field>
@@ -72,7 +72,7 @@ export function EventForm({
         <Field label="Virtual Link" htmlFor="virtualLink">
           <input id="virtualLink" name="virtualLink" defaultValue={event?.virtualLink ?? ''} className={inputClasses} />
         </Field>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Venue Name" htmlFor="venueName">
             <input id="venueName" name="venueName" defaultValue={event?.venueName ?? ''} className={inputClasses} />
           </Field>
@@ -93,7 +93,7 @@ export function EventForm({
             {forms.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
           </select>
         </Field>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Capacity" htmlFor="capacity">
             <input id="capacity" name="capacity" type="number" min={0} defaultValue={event?.capacity ?? ''} className={inputClasses} />
           </Field>
@@ -103,7 +103,7 @@ export function EventForm({
             </select>
           </Field>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Publish Status" htmlFor="status" required>
             <select id="status" name="status" required defaultValue={event?.status ?? 'DRAFT'} className={inputClasses}>
               {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}

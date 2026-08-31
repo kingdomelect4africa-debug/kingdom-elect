@@ -6,7 +6,7 @@ import { ADMIN_NAV } from './nav-data'
 import type { Domain } from '@/lib/rbac'
 import { cn } from '@/lib/cn'
 
-export function AdminSidebar({ accessible }: { accessible: Domain[] }) {
+export function AdminSidebar({ accessible, onNavigate }: { accessible: Domain[]; onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
@@ -28,6 +28,7 @@ export function AdminSidebar({ accessible }: { accessible: Domain[] }) {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={onNavigate}
                     className={cn(
                       'rounded-sm px-3 py-2 font-sans text-sm transition-colors',
                       active ? 'bg-white/10 text-ink-inverse' : 'text-ivory-600 hover:bg-white/5 hover:text-ink-inverse',

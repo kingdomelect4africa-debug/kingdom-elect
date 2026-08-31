@@ -22,7 +22,7 @@ export function OrganizationForm({
         <Field label="Slug" htmlFor="slug" hint="Leave blank to generate from the name.">
           <input id="slug" name="slug" defaultValue={organization?.slug} className={inputClasses} />
         </Field>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Type" htmlFor="type" required>
             <select id="type" name="type" required defaultValue={organization?.type ?? 'CORPORATE'} className={inputClasses}>
               {TYPE_OPTIONS.map((t) => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}

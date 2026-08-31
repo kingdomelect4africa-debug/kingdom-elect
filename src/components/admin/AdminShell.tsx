@@ -2,6 +2,7 @@ import { logout } from '@/lib/actions/auth'
 import { ROLE_LABELS, accessibleDomains } from '@/lib/rbac'
 import type { SessionUser } from '@/lib/auth'
 import { AdminSidebar } from './AdminSidebar'
+import { AdminMobileNav } from './AdminMobileNav'
 import { LogoMark } from '@/components/marketing/LogoMark'
 
 export function AdminShell({ user, children }: { user: SessionUser; children: React.ReactNode }) {
@@ -18,10 +19,13 @@ export function AdminShell({ user, children }: { user: SessionUser; children: Re
       </aside>
 
       <div className="flex min-h-screen flex-1 flex-col">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border-subtle bg-surface px-6">
-          <p className="font-sans text-sm text-ink-muted">Admin</p>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-border-subtle bg-surface px-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <AdminMobileNav accessible={accessible} />
+            <p className="hidden font-sans text-sm text-ink-muted sm:block">Admin</p>
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="hidden text-right sm:block">
               <p className="font-sans text-sm font-medium text-ink">{user.name}</p>
               <p className="font-sans text-xs text-ink-muted">{ROLE_LABELS[user.role]}</p>
             </div>
@@ -33,7 +37,7 @@ export function AdminShell({ user, children }: { user: SessionUser; children: Re
           </div>
         </header>
 
-        <main className="flex-1 px-6 py-8 lg:px-10">{children}</main>
+        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-10">{children}</main>
       </div>
     </div>
   )

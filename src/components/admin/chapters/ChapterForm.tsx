@@ -21,7 +21,7 @@ export function ChapterForm({
     <form action={action} className="flex max-w-3xl flex-col gap-8">
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Details</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Country" htmlFor="country" required>
             <input id="country" name="country" required defaultValue={chapter?.country} className={inputClasses} />
           </Field>
@@ -45,7 +45,7 @@ export function ChapterForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Contact &amp; Status</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Contact Email" htmlFor="contactEmail">
             <input id="contactEmail" name="contactEmail" type="email" defaultValue={chapter?.contactEmail ?? ''} className={inputClasses} />
           </Field>

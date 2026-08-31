@@ -95,7 +95,7 @@ export function ArticleForm({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Relations &amp; Publishing</legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Related Program" htmlFor="relatedProgramId">
             <select id="relatedProgramId" name="relatedProgramId" defaultValue={article?.relatedProgramId ?? ''} className={inputClasses}>
               <option value="">None</option>
@@ -109,7 +109,7 @@ export function ArticleForm({
             </select>
           </Field>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Published Date" htmlFor="publishedDate">
             <input id="publishedDate" name="publishedDate" type="date" defaultValue={toDateInputValue(article?.publishedDate)} className={inputClasses} />
           </Field>
