@@ -1,9 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import { motion } from 'motion/react'
 import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
+import { KingdomAura } from '@/components/devices/KingdomAura'
 
 export function SituationRoomHero({
   heading,
@@ -52,10 +52,9 @@ export function SituationRoomHero({
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative aspect-square overflow-hidden rounded-[var(--radius-md)] border border-line-navy"
+            className="relative aspect-square overflow-hidden rounded-[var(--radius-md)] border border-line-navy bg-navy-deep"
           >
-            {/* NASA Black Marble — Africa's city lights at night; public domain */}
-            <Image src="/brand/africa-night.jpg" alt="Africa at night, city lights seen from space" fill sizes="(min-width: 1024px) 40vw, 90vw" style={{ objectFit: 'cover' }} />
+            <KingdomAura className="inset-0" tone="deep" />
           </motion.div>
         </div>
       </Container>

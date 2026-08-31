@@ -1,9 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import { motion } from 'motion/react'
 import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
+import { KingdomAura } from '@/components/devices/KingdomAura'
 
 export function AboutHero({ heading, body }: { heading: string; body: string }) {
   return (
@@ -36,10 +36,9 @@ export function AboutHero({ heading, body }: { heading: string; body: string }) 
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="relative aspect-square overflow-hidden rounded-[var(--radius-md)] border border-line"
+            className="relative aspect-square overflow-hidden rounded-[var(--radius-md)] border border-line bg-navy"
           >
-            {/* NASA Blue Marble (Apollo 17) — public domain; see src/components/devices/HeroEarth.tsx */}
-            <Image src="/brand/earth-africa.jpg" alt="Earth from space, with Africa in frame" fill sizes="(min-width: 1024px) 40vw, 90vw" style={{ objectFit: 'cover' }} />
+            <KingdomAura className="inset-0" tone="navy" />
           </motion.div>
         </div>
       </Container>

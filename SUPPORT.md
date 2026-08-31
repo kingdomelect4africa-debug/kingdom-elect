@@ -155,8 +155,6 @@ src/
 scripts/extract-logo.js      One-off tool that extracted the real logo asset from brand-book PNGs
 kingdom-elect/                Static HTML/CSS/JS design reference used for the Aug 2026 UI redesign
 public/brand/logo-mark.png    The production logo asset; public/*.png are the original brand-book pages
-public/brand/earth-africa.jpg  Homepage + About hero image (NASA "Blue Marble", Apollo 17 — public domain)
-public/brand/africa-night.jpg  Situation Room hero image (NASA "Black Marble" night lights — public domain)
 ```
 
 ## 2.3 Running it locally

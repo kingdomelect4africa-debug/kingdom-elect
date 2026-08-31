@@ -43,18 +43,6 @@ export function KingdomFramework({
             <h2 className="mt-4 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-semibold text-ivory">{heading}</h2>
             <p className="mt-4 max-w-[380px] font-sans leading-[1.8] text-body-on-navy">{intro}</p>
 
-            {/* Mobile: horizontal scroll chain, no connecting line */}
-            <div className="mt-10 flex gap-6 overflow-x-auto pb-1 lg:hidden">
-              {steps.map((step, i) => (
-                <div key={step.label} className="flex flex-none flex-col items-start gap-[0.6rem]">
-                  <span className={cn('h-[21px] w-[21px] rounded-full border-[1.5px] border-line-navy-strong bg-navy transition-colors duration-500', i <= activeIndex && 'border-gold bg-gold')} />
-                  <span className={cn('whitespace-nowrap font-serif text-[0.85rem] font-medium text-faint-on-navy transition-colors duration-500', i === activeIndex && 'text-gold-light', i < activeIndex && 'text-ivory')}>
-                    {step.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-
             {/* Desktop: vertical chain with an animated progress line */}
             <div className="relative mt-10 hidden flex-col lg:flex">
               <span className="absolute left-[10px] top-[22px] bottom-[22px] w-px bg-line-navy" aria-hidden="true" />
@@ -74,7 +62,26 @@ export function KingdomFramework({
             </div>
           </div>
 
-          <div className="flex flex-col">
+          {/* Mobile: compact stacked list — no scroll-jacked full-height blocks */}
+          <div className="flex flex-col gap-8 lg:hidden">
+            {steps.map((step, i) => (
+              <div key={step.label} className="flex gap-4">
+                <div className="flex flex-col items-center">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold bg-navy font-serif text-[0.8rem] text-gold-light">
+                    {i + 1}
+                  </span>
+                  {i < steps.length - 1 && <span className="mt-2 w-px flex-1 bg-line-navy" aria-hidden="true" />}
+                </div>
+                <div className="pb-1">
+                  <h3 className="font-serif text-[1.25rem] font-semibold text-ivory">{step.label}</h3>
+                  <p className="mt-2 font-sans text-[0.95rem] leading-[1.75] text-body-on-navy">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: scroll-driven full-height blocks, paired with the sticky chain above */}
+          <div className="hidden flex-col lg:flex">
             {steps.map((step, i) => (
               <div
                 key={step.label}
