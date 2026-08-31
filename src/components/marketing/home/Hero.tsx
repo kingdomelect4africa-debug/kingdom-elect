@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Kicker } from '@/components/ui/Section'
 import { HeroGridLines } from '@/components/devices/HeroGridLines'
 import { HeroBars } from '@/components/devices/HeroBars'
+import { HeroEarth } from '@/components/devices/HeroEarth'
 
 function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null)
@@ -56,6 +57,7 @@ export function Hero({
 }) {
   return (
     <header className="relative z-0 flex min-h-[92vh] flex-col justify-center overflow-hidden bg-navy">
+      <HeroEarth className="-right-[55%] top-0 z-[1] h-[75%] w-[110%] sm:-right-[14%] sm:h-full sm:w-[62%]" />
       <HeroGridLines className="z-[1]" />
       <HeroBars className="absolute right-[4%] bottom-0 z-[1] h-[62%] opacity-85" />
 
