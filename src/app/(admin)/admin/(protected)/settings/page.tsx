@@ -22,6 +22,9 @@ export default async function SiteSettingsPage({ searchParams }: { searchParams:
         <Field label="Contact Email" htmlFor="contactEmail">
           <input id="contactEmail" name="contactEmail" type="email" defaultValue={settings?.contactEmail ?? ''} className={inputClasses} />
         </Field>
+        <Field label="Support Email" htmlFor="supportEmail">
+          <input id="supportEmail" name="supportEmail" type="email" defaultValue={settings?.supportEmail ?? ''} className={inputClasses} />
+        </Field>
         <Field label="Contact Phone" htmlFor="contactPhone">
           <input id="contactPhone" name="contactPhone" defaultValue={settings?.contactPhone ?? ''} className={inputClasses} />
         </Field>

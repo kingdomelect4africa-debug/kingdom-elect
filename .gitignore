@@ -8,9 +8,6 @@ node_modules/
 out/
 build/
 
-# payload
-media/
-
 # env
 .env
 .env.local

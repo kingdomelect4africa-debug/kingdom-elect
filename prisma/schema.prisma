@@ -45,6 +45,7 @@ model User {
   handledInquiries  Inquiry[]            @relation("InquiryHandledBy")
   auditLogs         AuditLog[]
   programsManaged   Program[]            @relation("ProgramManager")
+  uploadedMedia     Media[]
 
   @@index([role])
 }
@@ -79,18 +80,25 @@ model AuditLog {
 // ---------------------------------------------------------------------------
 
 model Media {
-  id        String   @id @default(cuid())
-  filename  String
-  url       String
-  mimeType  String
-  size      Int
-  width     Int?
-  height    Int?
-  alt       String
-  caption   String?
-  credit    String?
-  tags      String[]
-  createdAt DateTime @default(now())
+  id               String   @id @default(cuid())
+  filename         String
+  originalFilename String?
+  /// Cloudflare R2 object key — the source of truth for locating the file.
+  r2ObjectKey      String   @unique
+  /// Delivery URL derived from r2ObjectKey (same-origin proxy route today;
+  /// can point at a public R2 custom domain later without a schema change).
+  url              String
+  mimeType         String
+  size             Int
+  width            Int?
+  height            Int?
+  alt              String
+  caption          String?
+  credit           String?
+  tags             String[]
+  uploadedById     String?
+  uploadedBy       User?    @relation(fields: [uploadedById], references: [id])
+  createdAt        DateTime @default(now())
 
   personHeadshots       Person[]
   organizationLogos     Organization[]
@@ -775,6 +783,7 @@ model SiteSettings {
   logoMarkId          String?
   faviconId           String?
   contactEmail        String?
+  supportEmail        String?
   contactPhone        String?
   address             String?
   socialLinks         Json?

@@ -12,12 +12,16 @@ async function main() {
   // -------------------------------------------------------------------------
   await prisma.siteSettings.upsert({
     where: { id: 1 },
-    update: {},
+    update: {
+      contactEmail: 'info@kingdomelect4africa.online',
+      supportEmail: 'support@kingdomelect4africa.online',
+    },
     create: {
       id: 1,
       siteName: 'Kingdom E.L.E.C.T. for Africa',
       tagline: 'Building Influence. Transforming Africa.',
-      contactEmail: 'info@kingdomelect.africa',
+      contactEmail: 'info@kingdomelect4africa.online',
+      supportEmail: 'support@kingdomelect4africa.online',
       footerText:
         'Kingdom E.L.E.C.T. for Africa mobilizes Educators, Leaders, Entrepreneurs, Creatives, and Technocrats to transform Africa by reforming people, strengthening institutions, and developing territories.',
       defaultSeoTitle: 'Kingdom E.L.E.C.T. for Africa',
@@ -124,14 +128,16 @@ async function main() {
   // -------------------------------------------------------------------------
   const registrationForm = await prisma.formDefinition.upsert({
     where: { slug: 'situation-room-2026-registration' },
-    update: {},
+    update: {
+      notificationEmails: ['contact@kingdomelect4africa.online'],
+    },
     create: {
       name: 'The Situation Room 2026 — Registration',
       slug: 'situation-room-2026-registration',
       confirmationType: 'MESSAGE',
       confirmationMessage:
         "Your seat in the Situation Room is registered. A confirmation with full delegate briefing will follow by email.",
-      notificationEmails: [SUPER_ADMIN_EMAIL],
+      notificationEmails: ['contact@kingdomelect4africa.online'],
       fields: [
         { id: 'fullName', type: 'text', label: 'Full name', required: true },
         { id: 'email', type: 'email', label: 'Email address', required: true },

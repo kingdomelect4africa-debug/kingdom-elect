@@ -48,6 +48,14 @@ export default async function ContactPage() {
                   <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.contactEmail}</div>
                 </div>
               )}
+              {settings?.supportEmail && (
+                <div className="mt-7">
+                  <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
+                    Support
+                  </span>
+                  <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.supportEmail}</div>
+                </div>
+              )}
               {settings?.contactPhone && (
                 <div className="mt-7">
                   <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>

@@ -1,12 +1,10 @@
 'use server'
 
-import { mkdir, unlink, writeFile } from 'fs/promises'
-import path from 'path'
-import { randomBytes } from 'crypto'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { requireUser } from '@/lib/auth'
+import { buildObjectKey, deleteObject, deliveryUrlFor, uploadObject } from '@/lib/r2'
 
 const MEDIA_ROLES = ['CONTENT_EDITOR', 'EVENTS_MANAGER', 'COMMUNICATIONS_MANAGER'] as const
 
@@ -15,7 +13,7 @@ function str(formData: FormData, key: string): string {
 }
 
 export async function uploadMedia(formData: FormData) {
-  await requireUser([...MEDIA_ROLES])
+  const user = await requireUser([...MEDIA_ROLES])
 
   const file = formData.get('file')
   if (!(file instanceof File) || file.size === 0) {
@@ -33,28 +31,23 @@ export async function uploadMedia(formData: FormData) {
     .map((tag) => tag.trim())
     .filter(Boolean)
 
-  // Local-disk storage: suitable for development only. Production should swap
-  // this for real object storage (e.g. Cloudflare R2 / S3) behind this same
-  // action signature — mirroring how payments/email are stubbed elsewhere in
-  // this codebase (real records written, no live third-party wired up yet).
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
-  await mkdir(uploadsDir, { recursive: true })
-
-  const safeName = file.name.replace(/[^a-zA-Z0-9.-]+/g, '-').toLowerCase() || 'file'
-  const filename = `${randomBytes(8).toString('hex')}-${safeName}`
+  const objectKey = buildObjectKey('media/library', file.name || 'file')
   const buffer = Buffer.from(await file.arrayBuffer())
-  await writeFile(path.join(uploadsDir, filename), buffer)
+  await uploadObject(objectKey, buffer, file.type || 'application/octet-stream')
 
   await prisma.media.create({
     data: {
-      filename: file.name || filename,
-      url: `/uploads/${filename}`,
+      filename: file.name || objectKey,
+      originalFilename: file.name || null,
+      r2ObjectKey: objectKey,
+      url: deliveryUrlFor(objectKey),
       mimeType: file.type || 'application/octet-stream',
       size: file.size,
       alt,
       caption,
       credit,
       tags,
+      uploadedById: user.id,
     },
   })
 
@@ -67,14 +60,12 @@ export async function deleteMedia(mediaId: string) {
 
   const media = await prisma.media.delete({ where: { id: mediaId } })
 
-  // Best-effort cleanup of the underlying file — not required to succeed since
-  // the DB row (the source of truth for the library) is already gone.
-  if (media.url.startsWith('/uploads/')) {
-    try {
-      await unlink(path.join(process.cwd(), 'public', media.url))
-    } catch {
-      // Ignore — file may already be missing.
-    }
+  // Best-effort cleanup of the underlying object — not required to succeed
+  // since the DB row (the source of truth for the library) is already gone.
+  try {
+    await deleteObject(media.r2ObjectKey)
+  } catch {
+    // Ignore — object may already be missing.
   }
 
   revalidatePath('/admin/media')
