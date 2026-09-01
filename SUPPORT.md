@@ -47,7 +47,9 @@ This is the full flow, start to finish:
 2. **Create the event**: **Events → Create Event**. Fill in title, type, summary, full description, start/end date & time, timezone, venue (or mark it virtual and give a link), capacity, and — under Registration — pick the form you just built. Set **Registration Status** to Open, and **Publish Status** to Published when you're ready for it to go live.
 3. **Add speakers**: on the event's edit page, scroll to **Speakers** and pick an existing Person from the dropdown. If they're not in the system yet, create them first at **People → New Person**, then come back and add them here.
 4. The event now has a real public page with a working registration form. Anyone who submits it creates a real **Registration** record and, if they're new, a real **Person** record (matched by email, so the same person registering for two events never gets duplicated).
-5. **Managing registrants**: **Registrations** — filter by event, see who's registered and what they answered, and update their status (Registered → Confirmed → Checked In → Attended → No Show).
+5. **Managing registrants**: **Registrations** — filter by event, see who's registered, and update their status (Registered → Confirmed → Checked In → Attended → No Show). Click a person's name to open their full submitted responses.
+
+**The Situation Room is a special case**: instead of the generic form above, it has its own bespoke multi-step registration flow at `/the-situation-room/register` (a Typeform-style, one-question-per-screen experience — see `src/components/marketing/situation-room/register/`). Submissions still land in the same **Registrations** admin screen. Registering there also sends two emails automatically: a branded confirmation to the registrant, and a notification to `kingdomelect4africa@gmail.com` with a summary and a link to the full response. No other event has this yet — everything else uses the generic form above, which does not send any email.
 6. **On the day, checking people in**: **Check-In** is a fast, mobile-friendly screen — pick the event, search by name or email, tap **Check In**. (Check-In Staff accounts only see events they've specifically been assigned to.)
 
 ## 1.6 Running a program
@@ -122,6 +124,7 @@ Deactivating a user (rather than deleting) is the intended way to remove access 
 | Auth | Custom | scrypt hashing (`src/lib/password.ts`) + DB-backed sessions in an httpOnly cookie (`src/lib/auth.ts`) — no third-party auth library |
 | Hosting | Vercel | Project `kingdom-elect`, auto-deploys from GitHub `main`. One deployment serves both domains — `src/proxy.ts` splits traffic by hostname (see [§2.6](#26-deployment)) |
 | Media storage | **Cloudflare R2** (S3-compatible) | Bucket `kingdomelect`; client in `src/lib/r2.ts`; served via `src/app/api/media/[...key]/route.ts` (public by default, auth-gated for any `private/`-prefixed key) |
+| Email | **Resend** | `src/lib/email.ts` + hand-written templates in `src/emails/` (plain HTML/inline styles, not `@react-email/components` — that package is deprecated upstream in favor of a unified `react-email` package not yet production-ready; `@react-email/render` alone is still required and not deprecated). Wired for Situation Room registration only — see [§2.8](#28-outstanding-work) |
 | Source control | GitHub | `kingdomelect4africa-debug/kingdom-elect`, branch `main` |
 
 ## 2.2 Repository structure
@@ -188,6 +191,7 @@ Set in `.env.local` locally (gitignored) and in **Vercel → Project → Setting
 | `R2_ACCOUNT_ID` | Cloudflare account id — used to build the R2 S3-compatible endpoint |
 | `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | R2 API credentials (server-only, never exposed to the client) |
 | `R2_BUCKET` | R2 bucket name (`kingdomelect`) |
+| `RESEND_API_KEY` | Sends the Situation Room registration confirmation + admin notification emails |
 
 ## 2.6 Deployment
 
@@ -204,7 +208,8 @@ Set in `.env.local` locally (gitignored) and in **Vercel → Project → Setting
 
 ## 2.8 Outstanding work
 
-- **Live email delivery** — `FormDefinition.notificationEmails` and `SiteSettings.contactEmail`/`supportEmail` are real, populated fields, but nothing actually sends mail yet: no provider (Resend/SES/etc.) is wired, and `src/lib/actions/inquiry.ts`/`registration.ts` only write DB rows today. Building the actual send path (and deciding from/reply-to addresses) is still open.
+- **Live email delivery is wired for the Situation Room registration flow only** (`src/lib/email.ts` + `src/emails/*` via Resend, see [§2.1](#21-stack)) — the generic `src/lib/actions/registration.ts` (other events, driven by `FormDefinition.notificationEmails`) and `src/lib/actions/inquiry.ts` (Contact page) still only write DB rows and send nothing. Same infrastructure could be reused for both, just not done yet.
+- **Resend account is new and quota-limited** — as of setup, the account showed a `2/day` sending quota (well below Resend's normal published free tier), most likely a new-account probation limit. Registration emails degrade gracefully if a send fails (the Registration row is already saved; the failure is logged, not thrown), but check the Resend dashboard if confirmation emails stop arriving — the account likely needs additional verification to lift this.
 - **Live payment gateway** (`Registration.paymentProvider`/`paymentReference`/`paymentStatus` fields exist, unwired).
 - **Deeper art direction** on lighter-fidelity pages (Chapters, Partners, list pages).
 - **Automated RBAC test suite** — currently verified manually/via one-off scripts.

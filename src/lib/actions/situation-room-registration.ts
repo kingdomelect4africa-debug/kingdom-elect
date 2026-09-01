@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db'
 import { slugify } from '@/lib/format'
+import { sendSituationRoomEmails } from '@/lib/email'
 import type { Answers } from '@/components/marketing/situation-room/register/steps'
 
 const EVENT_SLUG = 'the-situation-room-2026'
@@ -98,7 +99,7 @@ export async function submitSituationRoomRegistration(answers: Answers): Promise
     submitted_at: new Date().toISOString(),
   }
 
-  await prisma.registration.create({
+  const registration = await prisma.registration.create({
     data: {
       eventId: event.id,
       personId: person.id,
@@ -106,6 +107,8 @@ export async function submitSituationRoomRegistration(answers: Answers): Promise
       status: 'REGISTERED',
     },
   })
+
+  await sendSituationRoomEmails(answers, registration.id)
 
   return { success: true }
 }
