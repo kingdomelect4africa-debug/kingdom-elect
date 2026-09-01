@@ -87,9 +87,9 @@ export default async function AdminRegistrationsPage({
               {registrations.map((registration) => (
                 <tr key={registration.id} className={tr}>
                   <td className={td}>
-                    <div>
+                    <Link href={`/admin/registrations/${registration.id}`} className="text-brand-primary hover:underline">
                       {registration.person.firstName} {registration.person.lastName}
-                    </div>
+                    </Link>
                     <div className="text-ink-muted">{registration.person.email}</div>
                   </td>
                   <td className={td}>{registration.event.title}</td>

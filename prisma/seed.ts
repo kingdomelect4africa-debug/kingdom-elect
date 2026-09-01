@@ -162,30 +162,31 @@ async function main() {
     },
   })
 
+  const situationRoomEventData = {
+    title: 'The Situation Room 2026',
+    type: 'SITUATION_ROOM' as const,
+    summary:
+      'A governance chamber convening Educators, Leaders, Entrepreneurs, Creatives, and Technocrats to diagnose, deliberate, and deploy Kingdom solutions for Africa.',
+    description:
+      'The annual convening of Kingdom E.L.E.C.T. for Africa — strategic Kingdom conversations, diagnostic roundtables, think tank sessions, policy and innovation dialogues, solution design labs, intergenerational mentorship, collaborative action planning, and Kingdom intelligence briefings, across four days.',
+    startDate: new Date('2026-12-26T09:00:00+01:00'),
+    endDate: new Date('2026-12-29T18:00:00+01:00'),
+    timezone: 'Africa/Lagos',
+    venueName: 'Transcorp Hilton, Abuja',
+    venueCity: 'Abuja',
+    venueCountry: 'NG',
+    isVirtual: false,
+    registrationFormId: registrationForm.id,
+    capacity: 200,
+    registrationStatus: 'OPEN' as const,
+    status: 'PUBLISHED' as const,
+    featuredOnHomepage: true,
+  }
+
   const situationRoomEvent = await prisma.event.upsert({
     where: { slug: 'the-situation-room-2026' },
-    update: {},
-    create: {
-      title: 'The Situation Room 2026',
-      slug: 'the-situation-room-2026',
-      type: 'SITUATION_ROOM',
-      summary:
-        'A governance chamber convening Educators, Leaders, Entrepreneurs, Creatives, and Technocrats to diagnose, deliberate, and deploy Kingdom solutions for Africa.',
-      description:
-        'The annual convening of Kingdom E.L.E.C.T. for Africa — strategic Kingdom conversations, diagnostic roundtables, think tank sessions, policy and innovation dialogues, solution design labs, intergenerational mentorship, collaborative action planning, and Kingdom intelligence briefings, across three days.',
-      startDate: new Date('2026-11-18T09:00:00+01:00'),
-      endDate: new Date('2026-11-20T18:00:00+01:00'),
-      timezone: 'Africa/Lagos',
-      venueName: 'Transcorp Hilton, Abuja',
-      venueCity: 'Abuja',
-      venueCountry: 'NG',
-      isVirtual: false,
-      registrationFormId: registrationForm.id,
-      capacity: 500,
-      registrationStatus: 'OPEN',
-      status: 'PUBLISHED',
-      featuredOnHomepage: true,
-    },
+    update: situationRoomEventData,
+    create: { slug: 'the-situation-room-2026', ...situationRoomEventData },
   })
 
   await Promise.all(

@@ -40,7 +40,7 @@ export function RegistrationPanel({
                     : [event.venueName, event.venueCity, event.venueCountry].filter(Boolean).join(', ')}
                 </p>
                 <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
-                  <Button href={`/events/${event.slug}`} variant="navy">
+                  <Button href="/the-situation-room/register" variant="navy">
                     {event.registrationStatus === 'CLOSED' ? 'Registration Closed' : 'Register for The Situation Room'}
                   </Button>
                 </div>
