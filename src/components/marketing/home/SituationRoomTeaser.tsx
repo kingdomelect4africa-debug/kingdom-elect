@@ -1,7 +1,7 @@
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { Kicker, LinkArrow } from '@/components/ui/Section'
-import { formatDateRange } from '@/lib/format'
+import { formatDateRange, countryName } from '@/lib/format'
 
 export function SituationRoomTeaser({
   heading,
@@ -35,11 +35,11 @@ export function SituationRoomTeaser({
                 {event.venueCity && (
                   <div className="mt-[0.4rem] font-sans text-[0.85rem] text-ivory/65">
                     {event.venueCity}
-                    {event.venueCountry ? `, ${event.venueCountry}` : ''}
+                    {event.venueCountry ? `, ${countryName(event.venueCountry)}` : ''}
                   </div>
                 )}
                 <div className="mt-6 flex flex-wrap items-center gap-4">
-                  <Button href={`/events/${event.slug}`} variant="gold" size="sm">
+                  <Button href="/the-situation-room/register" variant="gold" size="sm">
                     Enter the Situation Room
                   </Button>
                   <LinkArrow href="/the-situation-room" onDark>Learn more</LinkArrow>

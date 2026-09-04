@@ -46,6 +46,7 @@ export async function Footer() {
             </span>
             <ul className="flex flex-col gap-[0.7rem] font-sans text-[0.85rem] text-body-on-navy">
               {settings?.contactEmail && <li>{settings.contactEmail}</li>}
+              {settings?.supportEmail && <li>{settings.supportEmail}</li>}
               {settings?.contactPhone && <li>{settings.contactPhone}</li>}
               {settings?.address && <li>{settings.address}</li>}
               <li>

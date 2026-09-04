@@ -6,7 +6,7 @@ import { Kicker } from '@/components/ui/Section'
 import { SetNavTone } from '@/components/marketing/NavTone'
 import { RegistrationForm } from '@/components/marketing/forms/RegistrationForm'
 import { ArticleCard } from '@/components/marketing/ArticleCard'
-import { formatDateRange } from '@/lib/format'
+import { formatDateRange, countryName } from '@/lib/format'
 import type { FormFieldConfig } from '@/lib/forms'
 
 export const revalidate = 30
@@ -73,7 +73,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
               <strong className="block font-sans text-[0.92rem] font-semibold text-ink">
                 {event.isVirtual
                   ? 'Virtual'
-                  : [event.venueName, event.venueCity, event.venueCountry].filter(Boolean).join(', ') || 'To be announced'}
+                  : [event.venueName, event.venueCity, countryName(event.venueCountry)].filter(Boolean).join(', ') || 'To be announced'}
               </strong>
               Location
             </div>

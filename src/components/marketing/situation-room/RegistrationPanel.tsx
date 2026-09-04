@@ -1,6 +1,6 @@
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
-import { formatDateRange } from '@/lib/format'
+import { formatDateRange, countryName } from '@/lib/format'
 
 export function RegistrationPanel({
   event,
@@ -37,7 +37,7 @@ export function RegistrationPanel({
                 <p className="mx-auto mt-4 max-w-[420px] font-sans leading-[1.8] text-body">
                   {event.isVirtual
                     ? 'Virtual Convening'
-                    : [event.venueName, event.venueCity, event.venueCountry].filter(Boolean).join(', ')}
+                    : [event.venueName, event.venueCity, countryName(event.venueCountry)].filter(Boolean).join(', ')}
                 </p>
                 <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
                   <Button href="/the-situation-room/register" variant="navy">
