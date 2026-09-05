@@ -38,11 +38,10 @@ export function SituationRoomTeaser({
                     {event.venueCountry ? `, ${countryName(event.venueCountry)}` : ''}
                   </div>
                 )}
-                <div className="mt-6 flex flex-wrap items-center gap-4">
+                <div className="mt-6">
                   <Button href="/the-situation-room/register" variant="gold" size="sm">
                     Enter the Situation Room
                   </Button>
-                  <LinkArrow href="/the-situation-room" onDark>Learn more</LinkArrow>
                 </div>
               </>
             ) : (

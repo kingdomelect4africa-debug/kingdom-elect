@@ -352,7 +352,7 @@ async function main() {
       heroEyebrow: 'KINGDOM E.L.E.C.T. FOR AFRICA',
       heroHeading: 'The wealth of nations is not missing. It is ungoverned.',
       heroSubheading:
-        'Kingdom E.L.E.C.T. for Africa convenes Educators, Leaders, Entrepreneurs, Creatives, and Technocrats to diagnose, govern, and unlock the wealth systems held within Africa\'s people, institutions, and territories.',
+        "Kingdom E.L.E.C.T. for Africa convenes Educators, Leaders, Entrepreneurs, Creatives, and Technocrats to diagnose, govern, and unlock Africa's wealth systems.",
       heroPrimaryCtaLabel: 'Explore Kingdom E.L.E.C.T.',
       heroPrimaryCtaHref: '/about',
       heroSecondaryCtaLabel: 'Enter the Situation Room',

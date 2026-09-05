@@ -29,7 +29,7 @@ export function IntelligenceTeaser({
           </div>
         ) : (
           <p className="mt-8 border-t border-line py-8 font-sans text-body">
-            The intelligence desk is quiet for now — new research and briefings will appear here.
+            The intelligence desk is quiet for now. New research and briefings will appear here.
           </p>
         )}
       </Container>

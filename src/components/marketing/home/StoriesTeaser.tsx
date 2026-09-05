@@ -41,7 +41,7 @@ export function StoriesTeaser({ stories }: { stories: StoryItem[] }) {
                 </span>
                 <h4 className="mt-2 font-serif text-[1.2rem] font-semibold text-ivory">{story.title}</h4>
                 <p className="mt-1 font-sans text-[0.85rem] text-ivory/75">
-                  {story.personFeatured.firstName} {story.personFeatured.lastName} — {story.summary}
+                  {story.personFeatured.firstName} {story.personFeatured.lastName}: {story.summary}
                 </p>
               </div>
             </Link>

@@ -21,7 +21,7 @@ export function ProgramsEventsTeaser({
           {programs.length > 0 ? (
             programs.map((program) => <ProgramCard key={program.slug} program={program} />)
           ) : (
-            <p className="font-sans text-body">New programs are in development — check back soon.</p>
+            <p className="font-sans text-body">New programs are in development. Check back soon.</p>
           )}
         </div>
 
