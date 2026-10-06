@@ -1,5 +1,5 @@
 import { Field, SubmitButton, inputClasses } from '@/components/admin/ui'
-import type { PillarTag, Program, ProgramStatus, User } from '@prisma/client'
+import type { FormDefinition, PillarTag, Program, ProgramStatus, User } from '@prisma/client'
 
 const STATUS_OPTIONS: ProgramStatus[] = ['OPEN_FOR_APPLICATIONS', 'ONGOING', 'CLOSED', 'ARCHIVED']
 const PILLAR_OPTIONS: PillarTag[] = ['EDUCATOR', 'LEADER', 'ENTREPRENEUR', 'CREATIVE', 'TECHNOCRAT']
@@ -8,10 +8,12 @@ export function ProgramForm({
   action,
   program,
   programManagers,
+  forms,
 }: {
   action: (formData: FormData) => Promise<void>
   program?: Program
   programManagers: Pick<User, 'id' | 'name'>[]
+  forms: Pick<FormDefinition, 'id' | 'name'>[]
 }) {
   return (
     <form action={action} className="flex max-w-3xl flex-col gap-8">
@@ -64,6 +66,16 @@ export function ProgramForm({
             </select>
           </Field>
         </div>
+        <Field
+          label="Application Form"
+          htmlFor="applicationFormId"
+          hint="Shown on the program page while the status is Open for Applications. Create one under Form Builder if none exists yet."
+        >
+          <select id="applicationFormId" name="applicationFormId" defaultValue={program?.applicationFormId ?? ''} className={inputClasses}>
+            <option value="">None</option>
+            {forms.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+          </select>
+        </Field>
         <label className="flex items-center gap-2 font-sans text-sm text-ink">
           <input type="checkbox" name="featuredOnHomepage" defaultChecked={program?.featuredOnHomepage} className="h-4 w-4" />
           Feature on homepage

@@ -20,6 +20,7 @@ function programPayload(formData: FormData) {
     pillarTags: formData.getAll('pillarTags') as PillarTag[],
     status: str(formData, 'status') as ProgramStatus,
     programManagerId: str(formData, 'programManagerId') || null,
+    applicationFormId: str(formData, 'applicationFormId') || null,
     featuredOnHomepage: formData.get('featuredOnHomepage') === 'on',
     seoTitle: str(formData, 'seoTitle') || null,
     seoDescription: str(formData, 'seoDescription') || null,

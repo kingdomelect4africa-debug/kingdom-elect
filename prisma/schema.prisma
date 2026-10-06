@@ -301,6 +301,8 @@ model Program {
   status             ProgramStatus @default(ONGOING)
   programManagerId   String?
   programManager     User?         @relation("ProgramManager", fields: [programManagerId], references: [id])
+  applicationFormId  String?
+  applicationForm    FormDefinition? @relation(fields: [applicationFormId], references: [id])
   featuredOnHomepage Boolean       @default(false)
   seoTitle           String?
   seoDescription     String?
@@ -568,6 +570,7 @@ model FormDefinition {
   updatedAt         DateTime         @updatedAt
 
   events        Event[]
+  programs      Program[]
   cohorts       Cohort[]
   registrations Registration[]
   applications  Application[]

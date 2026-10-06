@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { PageHeader, Badge } from '@/components/admin/ui'
 import { formatDate } from '@/lib/format'
+import { fieldLabels } from '@/lib/forms'
 
 const STATUS_TONE: Record<string, 'default' | 'success' | 'warning' | 'muted'> = {
   REGISTERED: 'default',
@@ -45,13 +46,14 @@ export default async function AdminRegistrationDetailPage({ params }: { params: 
   const { id } = await params
   const registration = await prisma.registration.findUnique({
     where: { id },
-    include: { person: true, event: { select: { id: true, title: true, slug: true } } },
+    include: { person: true, event: { select: { id: true, title: true, slug: true } }, form: { select: { fields: true } } },
   })
 
   if (!registration) notFound()
 
   const responses = (registration.responses ?? {}) as Record<string, unknown>
   const submittedAt = typeof responses.submitted_at === 'string' ? responses.submitted_at : null
+  const labels = fieldLabels(registration.form?.fields)
 
   return (
     <div>
@@ -88,7 +90,7 @@ export default async function AdminRegistrationDetailPage({ params }: { params: 
           .filter(([key]) => key !== 'submitted_at')
           .map(([key, value]) => (
             <div key={key} className="grid gap-1 px-5 py-4 sm:grid-cols-[280px_1fr] sm:gap-4">
-              <p className="font-sans text-xs font-semibold uppercase text-ink-muted">{humanizeKey(key)}</p>
+              <p className="font-sans text-xs font-semibold uppercase text-ink-muted">{labels[key] ?? humanizeKey(key)}</p>
               <div className="font-sans text-sm text-ink">
                 <ResponseValue value={value} />
               </div>

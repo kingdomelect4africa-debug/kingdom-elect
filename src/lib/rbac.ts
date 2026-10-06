@@ -88,3 +88,13 @@ export function canEditArticle(user: SessionUser, article: { createdById: string
   if (user.role === 'AUTHOR') return article.createdById === user.id && article.status !== 'PUBLISHED'
   return false
 }
+
+/** Matches the roles the event Server Actions accept. */
+export function canManageEvents(user: SessionUser): boolean {
+  return user.role === 'SUPER_ADMIN' || user.role === 'EVENTS_MANAGER'
+}
+
+/** Matches the roles the program Server Actions accept. */
+export function canManagePrograms(user: SessionUser): boolean {
+  return user.role === 'SUPER_ADMIN' || user.role === 'PROGRAM_MANAGER'
+}

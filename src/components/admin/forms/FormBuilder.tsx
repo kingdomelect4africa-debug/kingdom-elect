@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Field, SubmitButton, inputClasses } from '@/components/admin/ui'
 import type { FormDefinition } from '@prisma/client'
-import type { FormFieldConfig, FormFieldType } from '@/lib/forms'
+import type { AttachTarget, FormFieldConfig, FormFieldType } from '@/lib/forms'
 
 const FIELD_TYPES: FormFieldType[] = [
   'text',
@@ -33,14 +33,72 @@ function blankField(): FormFieldConfig {
   return { id: generateFieldId(), type: 'text', label: '', required: false }
 }
 
+function AttachList({
+  heading,
+  name,
+  items,
+  formId,
+  emptyText,
+}: {
+  heading: string
+  name: string
+  items: AttachTarget[]
+  formId?: string
+  emptyText: string
+}) {
+  return (
+    <div>
+      <p className={labelClasses}>{heading}</p>
+      {items.length === 0 ? (
+        <p className="font-sans text-sm text-ink-muted">{emptyText}</p>
+      ) : (
+        <div className="flex max-h-72 flex-col overflow-y-auto border border-border-subtle">
+          {items.map((item) => {
+            const usesOtherForm = item.currentForm && item.currentForm.id !== formId
+            return (
+              <label
+                key={item.id}
+                className="flex items-start gap-3 border-t border-border-subtle px-4 py-3 font-sans text-sm text-ink first:border-t-0"
+              >
+                <input
+                  type="checkbox"
+                  name={name}
+                  value={item.id}
+                  defaultChecked={!!formId && item.currentForm?.id === formId}
+                  className="mt-0.5 h-4 w-4 shrink-0"
+                />
+                <span>
+                  {item.title}
+                  {item.detail && <span className="text-ink-muted"> · {item.detail}</span>}
+                  {usesOtherForm && (
+                    <span className="mt-0.5 block text-xs text-ink-muted">
+                      Currently uses &ldquo;{item.currentForm!.name}&rdquo; — checking this replaces it.
+                    </span>
+                  )}
+                </span>
+              </label>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function FormBuilder({
   action,
   form,
   initialFields,
+  events,
+  programs,
 }: {
   action: (formData: FormData) => Promise<void>
   form?: FormDefinition
   initialFields: FormFieldConfig[]
+  /** Undefined when the current role can't edit events — hides that list. */
+  events?: AttachTarget[]
+  /** Undefined when the current role can't edit programs — hides that list. */
+  programs?: AttachTarget[]
 }) {
   const [fields, setFields] = useState<FormFieldConfig[]>(initialFields)
 
@@ -77,6 +135,34 @@ export function FormBuilder({
           <input id="slug" name="slug" defaultValue={form?.slug} className={inputClasses} />
         </Field>
       </fieldset>
+
+      {(events || programs) && (
+        <fieldset className="flex flex-col gap-6 border border-border-subtle p-6">
+          <legend className="px-2 font-serif text-lg text-brand-primary">Attach To</legend>
+          <p className="font-sans text-sm text-ink-muted">
+            Checked events use this as their registration form; checked programs use it as their application form.
+            Each event or program takes one form at a time.
+          </p>
+          {events && (
+            <AttachList
+              heading="Events — registration"
+              name="eventIds"
+              items={events}
+              formId={form?.id}
+              emptyText="No events yet."
+            />
+          )}
+          {programs && (
+            <AttachList
+              heading="Programs — applications"
+              name="programIds"
+              items={programs}
+              formId={form?.id}
+              emptyText="No programs yet."
+            />
+          )}
+        </fieldset>
+      )}
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Fields</legend>

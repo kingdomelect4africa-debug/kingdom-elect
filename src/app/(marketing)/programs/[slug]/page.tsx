@@ -5,6 +5,8 @@ import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
 import { Button } from '@/components/ui/Button'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { ApplicationForm } from '@/components/marketing/forms/ApplicationForm'
+import type { FormFieldConfig } from '@/lib/forms'
 
 export const revalidate = 60
 
@@ -26,7 +28,7 @@ const PILLAR_LABELS: Record<string, string> = {
 async function getProgram(slug: string) {
   return prisma.program.findUnique({
     where: { slug },
-    include: { cohorts: true },
+    include: { cohorts: true, applicationForm: true },
   })
 }
 
@@ -41,6 +43,11 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
   const { slug } = await params
   const program = await getProgram(slug)
   if (!program) notFound()
+
+  const applicationFields =
+    program.status === 'OPEN_FOR_APPLICATIONS' && program.applicationForm
+      ? ((program.applicationForm.fields as unknown as FormFieldConfig[]) ?? [])
+      : []
 
   return (
     <>
@@ -80,17 +87,29 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
             <div className="lg:col-span-4 lg:col-start-9">
               <div className="rounded-[var(--radius-md)] border border-line p-[1.75rem]">
-                <h2 className="font-serif text-xl font-semibold text-ink">
-                  {program.status === 'OPEN_FOR_APPLICATIONS' ? 'Applications are open' : 'Interested?'}
-                </h2>
-                <p className="mt-3 font-sans text-sm text-body">
-                  Applications are reviewed by the program team. Reach out to express interest.
-                </p>
-                <div className="mt-6">
-                  <Button href={`/get-involved?program=${program.slug}`} variant="navy">
-                    Apply / Enquire
-                  </Button>
-                </div>
+                {applicationFields.length > 0 ? (
+                  <>
+                    <h2 className="font-serif text-xl font-semibold text-ink">Apply</h2>
+                    <p className="mt-3 font-sans text-sm text-body">Applications are reviewed by the program team.</p>
+                    <div className="mt-6">
+                      <ApplicationForm programSlug={program.slug} fields={applicationFields} />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="font-serif text-xl font-semibold text-ink">
+                      {program.status === 'OPEN_FOR_APPLICATIONS' ? 'Applications are open' : 'Interested?'}
+                    </h2>
+                    <p className="mt-3 font-sans text-sm text-body">
+                      Applications are reviewed by the program team. Reach out to express interest.
+                    </p>
+                    <div className="mt-6">
+                      <Button href={`/get-involved?program=${program.slug}`} variant="navy">
+                        Apply / Enquire
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -3,21 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
-import { slugify } from '@/lib/format'
+import { readResponses, contactDetails, findOrCreatePerson } from '@/lib/form-submission'
 import type { FormFieldConfig } from '@/lib/forms'
-import type { PillarTag } from '@prisma/client'
 
 export type RegistrationActionState = {
   status: 'idle' | 'success' | 'error'
   message: string
-}
-
-const PILLAR_MAP: Record<string, PillarTag> = {
-  Educator: 'EDUCATOR',
-  Leader: 'LEADER',
-  Entrepreneur: 'ENTREPRENEUR',
-  Creative: 'CREATIVE',
-  Technocrat: 'TECHNOCRAT',
 }
 
 export async function submitRegistration(
@@ -47,55 +38,16 @@ export async function submitRegistration(
   }
 
   const fields = event.registrationForm.fields as unknown as FormFieldConfig[]
-  const responses: Record<string, string | boolean> = {}
+  const parsed = readResponses(fields, formData)
+  if (!parsed.ok) return { status: 'error', message: parsed.message }
+  const { responses } = parsed
 
-  for (const field of fields) {
-    if (field.type === 'checkbox' || field.type === 'consent') {
-      const checked = formData.get(field.id) === 'on'
-      if (field.required && !checked) {
-        return { status: 'error', message: `Please confirm: ${field.label}` }
-      }
-      responses[field.id] = checked
-    } else if (field.type === 'file') {
-      const file = formData.get(field.id)
-      // File storage is not wired to persistent object storage in this pass —
-      // we record the filename so the submission is real, not silently dropped.
-      responses[field.id] = file instanceof File && file.size > 0 ? file.name : ''
-    } else {
-      const value = (formData.get(field.id) as string | null)?.trim() ?? ''
-      if (field.required && !value) {
-        return { status: 'error', message: `${field.label} is required.` }
-      }
-      responses[field.id] = value
-    }
-  }
-
-  const email = String(responses.email ?? '').toLowerCase()
-  const fullName = String(responses.fullName ?? '').trim()
-
-  if (!email) {
+  const contact = contactDetails(fields, responses)
+  if (!contact.email) {
     return { status: 'error', message: 'An email address is required to register.' }
   }
 
-  let person = await prisma.person.findUnique({ where: { email } })
-
-  if (!person) {
-    const [firstName, ...rest] = fullName.split(' ').filter(Boolean)
-    const lastName = rest.join(' ') || '—'
-    const pillarValue = typeof responses.pillar === 'string' ? PILLAR_MAP[responses.pillar] : undefined
-
-    person = await prisma.person.create({
-      data: {
-        firstName: firstName || fullName || 'Guest',
-        lastName,
-        slug: slugify(`${firstName || 'guest'}-${lastName}-${Date.now().toString(36)}`),
-        email,
-        phone: typeof responses.phone === 'string' ? responses.phone : undefined,
-        country: typeof responses.country === 'string' ? responses.country : undefined,
-        pillarTags: pillarValue ? [pillarValue] : [],
-      },
-    })
-  }
+  const person = await findOrCreatePerson(contact)
 
   await prisma.registration.create({
     data: {

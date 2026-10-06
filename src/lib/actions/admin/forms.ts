@@ -3,8 +3,9 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
-import { requireUser } from '@/lib/auth'
+import { requireUser, type SessionUser } from '@/lib/auth'
 import { slugify } from '@/lib/format'
+import { canManageEvents, canManagePrograms } from '@/lib/rbac'
 import type { ConfirmationType, Prisma } from '@prisma/client'
 import type { FormFieldConfig } from '@/lib/forms'
 
@@ -58,18 +59,56 @@ function formPayload(formData: FormData) {
   }
 }
 
-export async function createForm(formData: FormData) {
-  await requireUser(['EVENTS_MANAGER', 'PROGRAM_MANAGER'])
-  const form = await prisma.formDefinition.create({ data: formPayload(formData) })
+/**
+ * The events/programs checked in the Form Builder's "Attach To" section. A
+ * list stays undefined (left untouched on save) when the role can't edit that
+ * entity — the builder hides it for them, so an empty list there would
+ * otherwise read as "detach everything".
+ */
+function attachTargets(user: SessionUser, formData: FormData) {
+  const ids = (key: string) => formData.getAll(key).map(String).filter(Boolean).map((id) => ({ id }))
+  return {
+    events: canManageEvents(user) ? ids('eventIds') : undefined,
+    programs: canManagePrograms(user) ? ids('programIds') : undefined,
+  }
+}
+
+/** Public pages render the attached form's fields, so they go stale on any save. */
+function revalidateFormPaths(formId?: string) {
   revalidatePath('/admin/forms')
+  if (formId) revalidatePath(`/admin/forms/${formId}`)
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/programs/[slug]', 'page')
+}
+
+export async function createForm(formData: FormData) {
+  const user = await requireUser(['EVENTS_MANAGER', 'PROGRAM_MANAGER'])
+  const { events, programs } = attachTargets(user, formData)
+  const form = await prisma.formDefinition.create({
+    data: {
+      ...formPayload(formData),
+      events: events && { connect: events },
+      programs: programs && { connect: programs },
+    },
+  })
+  revalidateFormPaths()
   redirect(`/admin/forms/${form.id}?saved=1`)
 }
 
 export async function updateForm(formId: string, formData: FormData) {
-  await requireUser(['EVENTS_MANAGER', 'PROGRAM_MANAGER'])
-  await prisma.formDefinition.update({ where: { id: formId }, data: formPayload(formData) })
-  revalidatePath('/admin/forms')
-  revalidatePath(`/admin/forms/${formId}`)
+  const user = await requireUser(['EVENTS_MANAGER', 'PROGRAM_MANAGER'])
+  const { events, programs } = attachTargets(user, formData)
+  // `set` detaches whatever this form was attached to but is no longer
+  // checked, and attaches (replacing any other form on) whatever is checked.
+  await prisma.formDefinition.update({
+    where: { id: formId },
+    data: {
+      ...formPayload(formData),
+      events: events && { set: events },
+      programs: programs && { set: programs },
+    },
+  })
+  revalidateFormPaths(formId)
   redirect(`/admin/forms/${formId}?saved=1`)
 }
 
@@ -78,15 +117,16 @@ export async function deleteForm(formId: string) {
 
   const form = await prisma.formDefinition.findUniqueOrThrow({
     where: { id: formId },
-    include: { _count: { select: { events: true, cohorts: true } } },
+    include: { _count: { select: { events: true, programs: true, cohorts: true } } },
   })
 
-  // Deleting a form that's still wired to an Event or Cohort would silently
-  // orphan the reference (the FK is nullable, so Prisma wouldn't stop us) —
-  // block it here instead so an admin has to detach it first.
-  if (form._count.events > 0 || form._count.cohorts > 0) {
+  // Deleting a form that's still wired to an Event, Program or Cohort would
+  // silently orphan the reference (the FK is nullable, so Prisma wouldn't stop
+  // us) — block it here instead so an admin has to detach it first.
+  const { events, programs, cohorts } = form._count
+  if (events > 0 || programs > 0 || cohorts > 0) {
     throw new Error(
-      `"${form.name}" is still attached to ${form._count.events} event(s) and ${form._count.cohorts} cohort(s). Detach it from those before deleting.`,
+      `"${form.name}" is still attached to ${events} event(s), ${programs} program(s) and ${cohorts} cohort(s). Detach it from those before deleting.`,
     )
   }
 

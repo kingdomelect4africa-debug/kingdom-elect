@@ -4,16 +4,19 @@ import { PageHeader } from '@/components/admin/ui'
 import { ProgramForm } from '@/components/admin/programs/ProgramForm'
 
 export default async function NewProgramPage() {
-  const programManagers = await prisma.user.findMany({
-    where: { role: { in: ['PROGRAM_MANAGER', 'SUPER_ADMIN'] }, active: true },
-    orderBy: { name: 'asc' },
-    select: { id: true, name: true },
-  })
+  const [programManagers, forms] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: { in: ['PROGRAM_MANAGER', 'SUPER_ADMIN'] }, active: true },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true },
+    }),
+    prisma.formDefinition.findMany({ select: { id: true, name: true } }),
+  ])
 
   return (
     <div>
       <PageHeader title="Create Program" />
-      <ProgramForm action={createProgram} programManagers={programManagers} />
+      <ProgramForm action={createProgram} programManagers={programManagers} forms={forms} />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { updateApplicationStatus } from '@/lib/actions/admin/applications'
 import { PageHeader, Field, SubmitButton, inputClasses } from '@/components/admin/ui'
 import { SavedBanner } from '@/components/admin/SavedBanner'
 import { formatDate } from '@/lib/format'
+import { fieldLabels } from '@/lib/forms'
 import type { ApplicationStatus } from '@prisma/client'
 
 const STATUS_OPTIONS: ApplicationStatus[] = ['SUBMITTED', 'UNDER_REVIEW', 'SHORTLISTED', 'ACCEPTED', 'REJECTED', 'ENROLLED', 'WITHDRAWN']
@@ -36,6 +37,7 @@ export default async function ApplicationDetailPage({
         program: { select: { id: true, title: true } },
         cohort: { select: { id: true, name: true } },
         reviewedBy: { select: { name: true } },
+        form: { select: { fields: true } },
       },
     }),
     getCurrentUser(),
@@ -45,6 +47,7 @@ export default async function ApplicationDetailPage({
 
   const responses = (application.responses ?? {}) as Record<string, unknown>
   const responseEntries = Object.entries(responses)
+  const labels = fieldLabels(application.form?.fields)
   const canReview = user ? canViewReviewerNotes(user) : false
 
   return (
@@ -96,7 +99,7 @@ export default async function ApplicationDetailPage({
               <dl className="mt-4 flex flex-col gap-3 font-sans text-sm">
                 {responseEntries.map(([key, value]) => (
                   <div key={key} className="border-t border-border-subtle pt-3 first:border-t-0 first:pt-0">
-                    <dt className="font-sans text-xs font-semibold uppercase text-ink-muted" style={{ letterSpacing: '0.05em' }}>{key}</dt>
+                    <dt className="font-sans text-xs font-semibold uppercase text-ink-muted" style={{ letterSpacing: '0.05em' }}>{labels[key] ?? key}</dt>
                     <dd className="mt-1 text-ink">{formatResponseValue(value)}</dd>
                   </div>
                 ))}

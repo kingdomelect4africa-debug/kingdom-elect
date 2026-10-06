@@ -17,7 +17,7 @@ export default async function EditProgramPage({
   const { id } = await params
   const { saved } = await searchParams
 
-  const [program, programManagers] = await Promise.all([
+  const [program, programManagers, forms] = await Promise.all([
     prisma.program.findUnique({
       where: { id },
       include: {
@@ -30,6 +30,7 @@ export default async function EditProgramPage({
       orderBy: { name: 'asc' },
       select: { id: true, name: true },
     }),
+    prisma.formDefinition.findMany({ select: { id: true, name: true } }),
   ])
 
   if (!program) notFound()
@@ -51,7 +52,7 @@ export default async function EditProgramPage({
       />
       <SavedBanner saved={saved === '1'} />
 
-      <ProgramForm action={updateProgram.bind(null, program.id)} program={program} programManagers={programManagers} />
+      <ProgramForm action={updateProgram.bind(null, program.id)} program={program} programManagers={programManagers} forms={forms} />
 
       <div className="mt-10 max-w-3xl border border-border-subtle p-6">
         <h2 className="font-serif text-lg text-brand-primary">Cohorts</h2>
