@@ -160,6 +160,7 @@ model Person {
   storiesFeatured   Story[]             @relation("StoryFeaturedPerson")
   registrations     Registration[]
   applications      Application[]
+  formSubmissions   FormSubmission[]
   primaryForOrgs    Organization[]      @relation("OrganizationPrimaryContact")
   partnershipsAsContact Partnership[]   @relation("PartnershipPrimaryContact")
   leadOfChapters    Chapter[]           @relation("ChapterLead")
@@ -574,6 +575,22 @@ model FormDefinition {
   cohorts       Cohort[]
   registrations Registration[]
   applications  Application[]
+  submissions   FormSubmission[]
+}
+
+/// A response to a form through its public link (/forms/[slug]) while the
+/// form isn't attached to an event or program — those become Registrations
+/// and Applications instead.
+model FormSubmission {
+  id        String         @id @default(cuid())
+  formId    String
+  form      FormDefinition @relation(fields: [formId], references: [id], onDelete: Cascade)
+  personId  String?
+  person    Person?        @relation(fields: [personId], references: [id])
+  responses Json
+  createdAt DateTime       @default(now())
+
+  @@index([formId])
 }
 
 enum RegistrationStatus {

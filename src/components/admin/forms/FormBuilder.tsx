@@ -131,7 +131,11 @@ export function FormBuilder({
         <Field label="Name" htmlFor="name" required>
           <input id="name" name="name" required defaultValue={form?.name} className={inputClasses} />
         </Field>
-        <Field label="Slug" htmlFor="slug" hint="Leave blank to generate from the name.">
+        <Field
+          label="Slug"
+          htmlFor="slug"
+          hint="The form's link is /forms/your-slug. Leave blank to generate from the name — changing it later breaks links already shared."
+        >
           <input id="slug" name="slug" defaultValue={form?.slug} className={inputClasses} />
         </Field>
       </fieldset>

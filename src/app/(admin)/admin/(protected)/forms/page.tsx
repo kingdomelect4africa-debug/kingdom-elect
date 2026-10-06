@@ -1,13 +1,17 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
+import { publicOrigin } from '@/lib/site'
 import { PageHeader, PrimaryLinkButton, EmptyState, th, td, tr } from '@/components/admin/ui'
 import type { FormFieldConfig } from '@/lib/forms'
 
 export default async function AdminFormsPage() {
-  const forms = await prisma.formDefinition.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: { _count: { select: { events: true, programs: true } } },
-  })
+  const [forms, origin] = await Promise.all([
+    prisma.formDefinition.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { _count: { select: { events: true, programs: true } } },
+    }),
+    publicOrigin(),
+  ])
 
   return (
     <div>
@@ -33,6 +37,7 @@ export default async function AdminFormsPage() {
                 <th className={th}>Fields</th>
                 <th className={th}>Events</th>
                 <th className={th}>Programs</th>
+                <th className={th}>Link</th>
                 <th className={th}></th>
               </tr>
             </thead>
@@ -45,6 +50,11 @@ export default async function AdminFormsPage() {
                     <td className={td}>{fieldCount}</td>
                     <td className={td}>{form._count.events}</td>
                     <td className={td}>{form._count.programs}</td>
+                    <td className={td}>
+                      <a href={`${origin}/forms/${form.slug}`} target="_blank" rel="noreferrer" className="text-brand-primary underline-offset-4 hover:underline">
+                        /forms/{form.slug} ↗
+                      </a>
+                    </td>
                     <td className={td}>
                       <Link href={`/admin/forms/${form.id}`} className="text-brand-primary underline-offset-4 hover:underline">
                         Edit

@@ -79,6 +79,7 @@ function revalidateFormPaths(formId?: string) {
   if (formId) revalidatePath(`/admin/forms/${formId}`)
   revalidatePath('/events/[slug]', 'page')
   revalidatePath('/programs/[slug]', 'page')
+  revalidatePath('/forms/[slug]', 'page')
 }
 
 export async function createForm(formData: FormData) {
