@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Field, SubmitButton, inputClasses } from '@/components/admin/ui'
 import type { FormDefinition } from '@prisma/client'
-import type { AttachTarget, FormFieldConfig, FormFieldType } from '@/lib/forms'
+import { isEmailField, type AttachTarget, type FormFieldConfig, type FormFieldType } from '@/lib/forms'
 
 const FIELD_TYPES: FormFieldType[] = [
   'text',
@@ -71,8 +71,8 @@ function AttachList({
                   {item.title}
                   {item.detail && <span className="text-ink-muted"> · {item.detail}</span>}
                   {usesOtherForm && (
-                    <span className="mt-0.5 block text-xs text-ink-muted">
-                      Currently uses &ldquo;{item.currentForm!.name}&rdquo; — checking this replaces it.
+                    <span className="mt-0.5 block text-xs text-gold-800">
+                      Currently uses &ldquo;{item.currentForm!.name}&rdquo; — checking this replaces that form.
                     </span>
                   )}
                 </span>
@@ -147,6 +147,12 @@ export function FormBuilder({
             Checked events use this as their registration form; checked programs use it as their application form.
             Each event or program takes one form at a time.
           </p>
+          {!fields.some(isEmailField) && (
+            <p className="border border-gold-600 bg-gold-50 px-4 py-3 font-sans text-sm text-gold-800">
+              This form has no email field. Registrations and applications are tied to a person by email, so add one
+              before attaching it — otherwise every submission is rejected.
+            </p>
+          )}
           {events && (
             <AttachList
               heading="Events — registration"

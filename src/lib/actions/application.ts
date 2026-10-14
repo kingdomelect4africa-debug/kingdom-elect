@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
-import { readResponses, contactDetails, findOrCreatePerson } from '@/lib/form-submission'
+import { readResponses, contactDetails, findOrCreatePerson, isValidEmail } from '@/lib/form-submission'
 import type { FormFieldConfig } from '@/lib/forms'
 
 export type ApplicationActionState = {
@@ -41,6 +41,9 @@ export async function submitApplication(
   const contact = contactDetails(fields, responses)
   if (!contact.email) {
     return { status: 'error', message: 'An email address is required to apply.' }
+  }
+  if (!isValidEmail(contact.email)) {
+    return { status: 'error', message: 'Please enter a valid email address.' }
   }
 
   const person = await findOrCreatePerson(contact)

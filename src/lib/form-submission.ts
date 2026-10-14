@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db'
 import { slugify } from '@/lib/format'
-import type { FormFieldConfig } from '@/lib/forms'
+import { isEmailField, type FormFieldConfig } from '@/lib/forms'
 import type { PillarTag } from '@prisma/client'
 
 // Shared by the public registration and application Server Actions. Kept out
@@ -15,6 +15,13 @@ const PILLAR_MAP: Record<string, PillarTag> = {
   Entrepreneur: 'ENTREPRENEUR',
   Creative: 'CREATIVE',
   Technocrat: 'TECHNOCRAT',
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/** Text fields labelled "Email" get no browser validation, so check here. */
+export function isValidEmail(email: string): boolean {
+  return EMAIL_PATTERN.test(email)
 }
 
 /** Reads every configured field out of the submission, enforcing `required`. */
@@ -57,7 +64,8 @@ function pick(fields: FormFieldConfig[], responses: FormResponses, match: (field
 /**
  * Seeded forms use fixed ids (`email`, `fullName`, …), but fields added in the
  * Form Builder get random ids. So each detail is looked up by its conventional
- * id first, then by field type — or by label for names, which are plain text.
+ * id first, then by field type — or by label for names, which are plain text,
+ * and for emails an admin built as a text field.
  */
 export function contactDetails(fields: FormFieldConfig[], responses: FormResponses) {
   const byLabel = (pattern: RegExp) => (field: FormFieldConfig) => field.type === 'text' && pattern.test(field.label)
@@ -72,7 +80,11 @@ export function contactDetails(fields: FormFieldConfig[], responses: FormRespons
   }
 
   return {
-    email: (pick(fields, responses, (f) => f.id === 'email') || pick(fields, responses, (f) => f.type === 'email')).toLowerCase(),
+    email: (
+      pick(fields, responses, (f) => f.id === 'email') ||
+      pick(fields, responses, (f) => f.type === 'email') ||
+      pick(fields, responses, isEmailField)
+    ).toLowerCase(),
     fullName,
     phone: pick(fields, responses, (f) => f.id === 'phone') || pick(fields, responses, (f) => f.type === 'phone'),
     country: pick(fields, responses, (f) => f.id === 'country') || pick(fields, responses, (f) => f.type === 'country'),

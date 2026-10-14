@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
-import { readResponses, contactDetails, findOrCreatePerson } from '@/lib/form-submission'
+import { readResponses, contactDetails, findOrCreatePerson, isValidEmail } from '@/lib/form-submission'
 import type { FormFieldConfig } from '@/lib/forms'
 
 export type FormResponseActionState = {
@@ -41,6 +41,9 @@ export async function submitFormResponse(
   // An email isn't required here (a form may be an anonymous survey), but
   // when there is one the response is tied to that Person like everything else.
   const contact = contactDetails(fields, responses)
+  if (contact.email && !isValidEmail(contact.email)) {
+    return { status: 'error', message: 'Please enter a valid email address.' }
+  }
   const person = contact.email ? await findOrCreatePerson(contact) : null
 
   await prisma.formSubmission.create({

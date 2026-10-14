@@ -12,6 +12,15 @@ export type FormFieldConfig = {
 }
 
 /**
+ * Whether a field collects the respondent's email — the email type, or a
+ * plain text field labelled as one ("Email address" built as `text` is common,
+ * and registrations/applications are tied to a Person by that email).
+ */
+export function isEmailField(field: FormFieldConfig): boolean {
+  return field.id === 'email' || field.type === 'email' || (field.type === 'text' && /e-?mail/i.test(field.label))
+}
+
+/**
  * Field id → label for a stored FormDefinition.fields value. Responses are
  * keyed by field id, and Form Builder ids are random, so admin screens need
  * this to show "Email address" rather than a UUID.
