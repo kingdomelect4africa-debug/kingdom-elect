@@ -41,7 +41,7 @@ export function useTierForm(tier: AccessTier) {
     event.preventDefault()
     if (pending) return
 
-    const found = validateTierAnswers(answers)
+    const found = validateTierAnswers(answers, tier)
     if (Object.keys(found).length > 0) {
       showErrors(found)
       return

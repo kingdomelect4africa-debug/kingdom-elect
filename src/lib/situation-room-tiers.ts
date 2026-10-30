@@ -9,6 +9,11 @@ import { INDUSTRY_OPTIONS, PHONE_COUNTRY_CODES } from '@/components/marketing/si
 export type AccessTier = 'VVIP' | 'VIP'
 export const ACCESS_TIERS: AccessTier[] = ['VVIP', 'VIP']
 
+/** Accommodation, and the spouse question that follows it, are VIP only. */
+export function asksAccommodation(tier: AccessTier): boolean {
+  return tier === 'VIP'
+}
+
 export const SECTOR_OPTIONS = INDUSTRY_OPTIONS
 export const GENDER_OPTIONS = ['Male', 'Female']
 export const YES_NO_OPTIONS = ['Yes', 'No']
@@ -20,7 +25,13 @@ export const SITUATION_ROOM_INTRO = {
   when: 'Abuja · December 26–29, 2026',
   body: 'Africa stands at the intersection of prophecy, potential, and paradox. This is a governance chamber — a strategic convergence of Kingdom-minded thinkers, builders, innovators and reformers committed to advancing God’s purpose for Africa through influence, excellence and transformational leadership.',
   closing: 'This is not a conference. It is a governance chamber.',
-  facts: ['Abuja', 'Dec 26–29, 2026', 'Free event, donations welcome', 'Shared accommodation for 80'],
+}
+
+const SHARED_FACTS = ['Abuja', 'Dec 26–29, 2026', 'Free event, donations welcome']
+
+export const TIER_FACTS: Record<AccessTier, string[]> = {
+  VVIP: SHARED_FACTS,
+  VIP: [...SHARED_FACTS, 'Shared accommodation for 80'],
 }
 
 export const TIER_QUESTIONS = {
@@ -32,6 +43,7 @@ export const TIER_QUESTIONS = {
   sector_other: 'Please specify your sector',
   business_niche: 'Business niche',
   needs_accommodation: 'Will you be needing accommodation?',
+  spouse_attending: 'Will you be coming with your spouse?',
   willing_to_partner: 'Are you willing to partner with or give towards the Situation Room?',
 }
 
@@ -45,6 +57,7 @@ export type TierAnswers = {
   sector_other: string
   business_niche: string
   needs_accommodation: string
+  spouse_attending: string
   willing_to_partner: string
 }
 
@@ -60,6 +73,7 @@ export const EMPTY_TIER_ANSWERS: TierAnswers = {
   sector_other: '',
   business_niche: '',
   needs_accommodation: '',
+  spouse_attending: '',
   willing_to_partner: '',
 }
 
@@ -73,6 +87,7 @@ export const TIER_FIELD_ORDER: (keyof TierAnswers)[] = [
   'sector_other',
   'business_niche',
   'needs_accommodation',
+  'spouse_attending',
   'willing_to_partner',
 ]
 
@@ -96,7 +111,7 @@ export function cleanTierAnswers(raw: unknown): TierAnswers {
   return clean
 }
 
-export function validateTierAnswers(answers: TierAnswers): TierErrors {
+export function validateTierAnswers(answers: TierAnswers, tier: AccessTier): TierErrors {
   const errors: TierErrors = {}
   const filled = (value: string) => value.trim().length > 0
 
@@ -109,7 +124,10 @@ export function validateTierAnswers(answers: TierAnswers): TierErrors {
   if (!SECTOR_OPTIONS.includes(answers.sector)) errors.sector = 'Please select your sector.'
   if (answers.sector === 'Other' && !filled(answers.sector_other)) errors.sector_other = 'Please tell us your sector.'
   if (!filled(answers.business_niche)) errors.business_niche = 'Please enter your business niche.'
-  if (!YES_NO_OPTIONS.includes(answers.needs_accommodation)) errors.needs_accommodation = 'Please choose Yes or No.'
+  if (asksAccommodation(tier)) {
+    if (!YES_NO_OPTIONS.includes(answers.needs_accommodation)) errors.needs_accommodation = 'Please choose Yes or No.'
+    if (!YES_NO_OPTIONS.includes(answers.spouse_attending)) errors.spouse_attending = 'Please choose Yes or No.'
+  }
   if (!YES_NO_OPTIONS.includes(answers.willing_to_partner)) errors.willing_to_partner = 'Please choose Yes or No.'
   return errors
 }

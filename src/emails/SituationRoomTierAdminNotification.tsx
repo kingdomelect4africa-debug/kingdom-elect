@@ -11,6 +11,7 @@ export function SituationRoomTierAdminNotificationEmail({
   sector,
   businessNiche,
   needsAccommodation,
+  spouseAttending,
   willingToPartner,
 }: {
   tier: AccessTier
@@ -21,7 +22,8 @@ export function SituationRoomTierAdminNotificationEmail({
   gender: string
   sector: string
   businessNiche: string
-  needsAccommodation: string
+  needsAccommodation?: string
+  spouseAttending?: string
   willingToPartner: string
 }) {
   return (
@@ -41,7 +43,8 @@ export function SituationRoomTierAdminNotificationEmail({
       <EmailFieldRow label="Gender" value={gender} />
       <EmailFieldRow label="Sector" value={sector} />
       <EmailFieldRow label="Business niche" value={businessNiche} />
-      <EmailFieldRow label="Accommodation needed" value={needsAccommodation} />
+      {needsAccommodation && <EmailFieldRow label="Accommodation needed" value={needsAccommodation} />}
+      {spouseAttending && <EmailFieldRow label="Coming with spouse" value={spouseAttending} />}
       <EmailFieldRow label="Willing to partner or give" value={willingToPartner} />
     </EmailLayout>
   )

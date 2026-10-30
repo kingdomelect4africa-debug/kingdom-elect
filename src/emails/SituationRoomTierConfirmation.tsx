@@ -5,11 +5,13 @@ export function SituationRoomTierConfirmationEmail({
   tier,
   firstName,
   needsAccommodation,
+  spouseAttending,
   willingToPartner,
 }: {
   tier: AccessTier
   firstName: string
-  needsAccommodation: string
+  needsAccommodation?: string
+  spouseAttending?: string
   willingToPartner: string
 }) {
   return (
@@ -28,7 +30,8 @@ export function SituationRoomTierConfirmationEmail({
 
       <EmailDivider />
 
-      <EmailFieldRow label="Accommodation needed" value={needsAccommodation} />
+      {needsAccommodation && <EmailFieldRow label="Accommodation needed" value={needsAccommodation} />}
+      {spouseAttending && <EmailFieldRow label="Coming with spouse" value={spouseAttending} />}
       <EmailFieldRow label="Willing to partner or give" value={willingToPartner} />
 
       <EmailDivider />

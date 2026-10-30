@@ -6,6 +6,7 @@ import {
   GENDER_OPTIONS,
   SECTOR_OPTIONS,
   SITUATION_ROOM_INTRO as INTRO,
+  TIER_FACTS,
   TIER_QUESTIONS as Q,
   YES_NO_OPTIONS,
   type TierAnswers,
@@ -143,8 +144,8 @@ export function VvipRegistration() {
               <p className="mt-6 font-serif text-[1.15rem] italic leading-[1.5] text-gold-light">{INTRO.closing}</p>
 
               <ul className="mt-9 grid grid-cols-2 gap-px border border-gold/25 bg-gold/25 text-center font-sans text-[0.86rem] leading-snug text-ivory">
-                {INTRO.facts.map((fact) => (
-                  <li key={fact} className="flex min-h-[64px] items-center justify-center bg-emerald-900 px-3 py-3">
+                {TIER_FACTS.VVIP.map((fact) => (
+                  <li key={fact} className="flex min-h-[64px] items-center justify-center bg-emerald-900 px-3 py-3 last:col-span-2">
                     {fact}
                   </li>
                 ))}
@@ -297,15 +298,6 @@ export function VvipRegistration() {
                 />
                 <FieldError id="business_niche-error" message={errors.business_niche} />
               </div>
-
-              <Choice
-                name="needs_accommodation"
-                legend={Q.needs_accommodation}
-                options={YES_NO_OPTIONS}
-                value={answers.needs_accommodation}
-                error={errors.needs_accommodation}
-                onChange={(value) => update('needs_accommodation', value)}
-              />
 
               <Choice
                 name="willing_to_partner"

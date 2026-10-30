@@ -5,6 +5,7 @@ import { slugify } from '@/lib/format'
 import { sendSituationRoomTierEmails } from '@/lib/email'
 import {
   ACCESS_TIERS,
+  asksAccommodation,
   cleanTierAnswers,
   displaySector,
   validateTierAnswers,
@@ -20,7 +21,7 @@ export async function submitSituationRoomTierRegistration(tier: AccessTier, raw:
   if (!ACCESS_TIERS.includes(tier)) return { success: false, message: 'This registration link is not valid.' }
 
   const answers = cleanTierAnswers(raw)
-  const errors = validateTierAnswers(answers)
+  const errors = validateTierAnswers(answers, tier)
   if (Object.keys(errors).length > 0) return { success: false, message: 'Please check the highlighted answers.', errors }
 
   const event = await prisma.event.findUnique({ where: { slug: EVENT_SLUG } })
@@ -61,7 +62,9 @@ export async function submitSituationRoomTierRegistration(tier: AccessTier, raw:
         gender: answers.gender,
         sector: displaySector(answers),
         business_niche: answers.business_niche,
-        needs_accommodation: answers.needs_accommodation,
+        ...(asksAccommodation(tier)
+          ? { needs_accommodation: answers.needs_accommodation, spouse_attending: answers.spouse_attending }
+          : {}),
         willing_to_partner: answers.willing_to_partner,
         submitted_at: new Date().toISOString(),
       },

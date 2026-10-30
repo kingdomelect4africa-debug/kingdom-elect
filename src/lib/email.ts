@@ -4,7 +4,7 @@ import { SituationRoomAdminNotificationEmail } from '@/emails/SituationRoomAdmin
 import type { Answers } from '@/components/marketing/situation-room/register/steps'
 import { SituationRoomTierConfirmationEmail } from '@/emails/SituationRoomTierConfirmation'
 import { SituationRoomTierAdminNotificationEmail } from '@/emails/SituationRoomTierAdminNotification'
-import { displaySector, type AccessTier, type TierAnswers } from '@/lib/situation-room-tiers'
+import { asksAccommodation, displaySector, type AccessTier, type TierAnswers } from '@/lib/situation-room-tiers'
 
 const FROM = 'Kingdom E.L.E.C.T. for Africa <registrations@kingdomelect4africa.online>'
 const ADMIN_NOTIFICATION_EMAIL = 'kingdomelect4africa@gmail.com'
@@ -72,6 +72,10 @@ export async function sendSituationRoomTierEmails(tier: AccessTier, answers: Tie
     return
   }
 
+  const accommodation = asksAccommodation(tier)
+    ? { needsAccommodation: answers.needs_accommodation, spouseAttending: answers.spouse_attending }
+    : {}
+
   const results = await Promise.allSettled([
     resend.emails.send({
       from: FROM,
@@ -81,7 +85,7 @@ export async function sendSituationRoomTierEmails(tier: AccessTier, answers: Tie
       react: SituationRoomTierConfirmationEmail({
         tier,
         firstName: answers.full_name.split(' ')[0] || answers.full_name,
-        needsAccommodation: answers.needs_accommodation,
+        ...accommodation,
         willingToPartner: answers.willing_to_partner,
       }),
     }),
@@ -99,7 +103,7 @@ export async function sendSituationRoomTierEmails(tier: AccessTier, answers: Tie
         gender: answers.gender,
         sector: displaySector(answers),
         businessNiche: answers.business_niche,
-        needsAccommodation: answers.needs_accommodation,
+        ...accommodation,
         willingToPartner: answers.willing_to_partner,
       }),
     }),

@@ -6,6 +6,7 @@ import {
   GENDER_OPTIONS,
   SECTOR_OPTIONS,
   SITUATION_ROOM_INTRO as INTRO,
+  TIER_FACTS,
   TIER_QUESTIONS as Q,
   YES_NO_OPTIONS,
   type TierAnswers,
@@ -115,7 +116,7 @@ export function VipRegistration() {
           <p className="mt-4 max-w-[42ch] font-serif text-[1.08rem] italic leading-[1.5] text-gold-light">{INTRO.closing}</p>
 
           <ul className="mt-7 grid max-w-[30rem] grid-cols-2 gap-x-5 gap-y-3 border-t border-line-navy-strong pt-5 font-sans text-[0.85rem] leading-snug text-ivory">
-            {INTRO.facts.map((fact) => (
+            {TIER_FACTS.VIP.map((fact) => (
               <li key={fact}>{fact}</li>
             ))}
           </ul>
@@ -299,6 +300,17 @@ export function VipRegistration() {
                 value={answers.needs_accommodation}
                 error={errors.needs_accommodation}
                 onChange={(value) => update('needs_accommodation', value)}
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <Segmented
+                name="spouse_attending"
+                legend={Q.spouse_attending}
+                options={YES_NO_OPTIONS}
+                value={answers.spouse_attending}
+                error={errors.spouse_attending}
+                onChange={(value) => update('spouse_attending', value)}
               />
             </div>
 
