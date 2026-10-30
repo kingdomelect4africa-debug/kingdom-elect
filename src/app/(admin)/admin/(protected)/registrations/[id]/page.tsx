@@ -69,6 +69,7 @@ export default async function AdminRegistrationDetailPage({ params }: { params: 
 
       <div className="mb-8 flex flex-wrap items-center gap-3">
         <Badge tone={STATUS_TONE[registration.status] ?? 'default'}>{registration.status.replace(/_/g, ' ')}</Badge>
+        {typeof responses.access_tier === 'string' && <Badge tone="warning">{responses.access_tier}</Badge>}
         <span className="font-sans text-sm text-ink-muted">Registered {formatDate(registration.createdAt)}</span>
         {submittedAt && <span className="font-sans text-sm text-ink-muted">· Submitted {formatDate(new Date(submittedAt))}</span>}
       </div>

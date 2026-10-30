@@ -4,6 +4,7 @@ import { PageHeader, Badge, EmptyState, th, td, tr, SubmitButton, inputClasses }
 import { SavedBanner } from '@/components/admin/SavedBanner'
 import { updateRegistrationStatus } from '@/lib/actions/admin/registrations'
 import { formatDate } from '@/lib/format'
+import { ACCESS_TIERS, type AccessTier } from '@/lib/situation-room-tiers'
 
 const STATUS_OPTIONS = ['REGISTERED', 'CONFIRMED', 'CHECKED_IN', 'ATTENDED', 'NO_SHOW']
 
@@ -13,6 +14,11 @@ const STATUS_TONE: Record<string, 'default' | 'success' | 'warning' | 'muted'> =
   CHECKED_IN: 'success',
   ATTENDED: 'success',
   NO_SHOW: 'muted',
+}
+
+function registrationTier(responses: unknown): string | null {
+  const tier = (responses as Record<string, unknown> | null)?.access_tier
+  return typeof tier === 'string' ? tier : null
 }
 
 const PAYMENT_TONE: Record<string, 'default' | 'success' | 'warning' | 'muted'> = {
@@ -26,20 +32,27 @@ const PAYMENT_TONE: Record<string, 'default' | 'success' | 'warning' | 'muted'> 
 export default async function AdminRegistrationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ event?: string; saved?: string }>
+  searchParams: Promise<{ event?: string; tier?: string; saved?: string }>
 }) {
-  const { event: eventId, saved } = await searchParams
+  const { event: eventId, tier: tierParam, saved } = await searchParams
+  const tier = ACCESS_TIERS.find((option: AccessTier) => option === tierParam)
 
   const [registrations, events] = await Promise.all([
     prisma.registration.findMany({
-      where: eventId ? { eventId } : undefined,
+      where: {
+        ...(eventId ? { eventId } : {}),
+        ...(tier ? { responses: { path: ['access_tier'], equals: tier } } : {}),
+      },
       orderBy: { createdAt: 'desc' },
       include: { person: true, event: { select: { id: true, title: true } } },
     }),
     prisma.event.findMany({ orderBy: { startDate: 'desc' }, select: { id: true, title: true } }),
   ])
 
-  const currentPath = eventId ? `/admin/registrations?event=${eventId}` : '/admin/registrations'
+  const query = new URLSearchParams()
+  if (eventId) query.set('event', eventId)
+  if (tier) query.set('tier', tier)
+  const currentPath = query.size > 0 ? `/admin/registrations?${query}` : '/admin/registrations'
 
   return (
     <div>
@@ -60,8 +73,21 @@ export default async function AdminRegistrationsPage({
             ))}
           </select>
         </div>
+        <div className="w-40">
+          <label htmlFor="tier" className="mb-1.5 block font-sans text-xs font-semibold uppercase text-ink">
+            Filter by Tier
+          </label>
+          <select id="tier" name="tier" defaultValue={tier ?? ''} className={inputClasses}>
+            <option value="">All tiers</option>
+            {ACCESS_TIERS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
         <SubmitButton>Filter</SubmitButton>
-        {eventId && (
+        {(eventId || tier) && (
           <Link href="/admin/registrations" className="font-sans text-xs uppercase text-ink-muted underline-offset-4 hover:underline">
             Clear filter
           </Link>
@@ -77,6 +103,7 @@ export default async function AdminRegistrationsPage({
               <tr>
                 <th className={th}>Person</th>
                 <th className={th}>Event</th>
+                <th className={th}>Tier</th>
                 <th className={th}>Status</th>
                 <th className={th}>Registered</th>
                 <th className={th}>Payment</th>
@@ -93,6 +120,13 @@ export default async function AdminRegistrationsPage({
                     <div className="text-ink-muted">{registration.person.email}</div>
                   </td>
                   <td className={td}>{registration.event.title}</td>
+                  <td className={td}>
+                    {registrationTier(registration.responses) ? (
+                      <Badge tone="warning">{registrationTier(registration.responses)}</Badge>
+                    ) : (
+                      <span className="text-ink-muted">General</span>
+                    )}
+                  </td>
                   <td className={td}>
                     <Badge tone={STATUS_TONE[registration.status] ?? 'default'}>{registration.status.replace(/_/g, ' ')}</Badge>
                   </td>

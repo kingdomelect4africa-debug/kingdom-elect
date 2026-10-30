@@ -2,6 +2,9 @@ import { Resend } from 'resend'
 import { SituationRoomConfirmationEmail } from '@/emails/SituationRoomConfirmation'
 import { SituationRoomAdminNotificationEmail } from '@/emails/SituationRoomAdminNotification'
 import type { Answers } from '@/components/marketing/situation-room/register/steps'
+import { SituationRoomTierConfirmationEmail } from '@/emails/SituationRoomTierConfirmation'
+import { SituationRoomTierAdminNotificationEmail } from '@/emails/SituationRoomTierAdminNotification'
+import { displaySector, type AccessTier, type TierAnswers } from '@/lib/situation-room-tiers'
 
 const FROM = 'Kingdom E.L.E.C.T. for Africa <registrations@kingdomelect4africa.online>'
 const ADMIN_NOTIFICATION_EMAIL = 'kingdomelect4africa@gmail.com'
@@ -54,6 +57,59 @@ export async function sendSituationRoomEmails(answers: Answers, registrationId: 
   for (const result of results) {
     if (result.status === 'rejected') {
       console.error('Situation Room registration email failed to send:', result.reason)
+    }
+  }
+}
+
+/**
+ * Same best-effort rules as sendSituationRoomEmails, for the VVIP and VIP
+ * forms. The Registration row is already saved when this runs.
+ */
+export async function sendSituationRoomTierEmails(tier: AccessTier, answers: TierAnswers, registrationId: string): Promise<void> {
+  const resend = getResendClient()
+  if (!resend) {
+    console.warn(`RESEND_API_KEY not set, skipping ${tier} registration emails.`)
+    return
+  }
+
+  const results = await Promise.allSettled([
+    resend.emails.send({
+      from: FROM,
+      to: answers.email,
+      replyTo: 'support@kingdomelect4africa.online',
+      subject: `Your ${tier} registration: Kingdom E.L.E.C.T. Situation Room`,
+      react: SituationRoomTierConfirmationEmail({
+        tier,
+        firstName: answers.full_name.split(' ')[0] || answers.full_name,
+        needsAccommodation: answers.needs_accommodation,
+        willingToPartner: answers.willing_to_partner,
+      }),
+    }),
+    resend.emails.send({
+      from: FROM,
+      to: ADMIN_NOTIFICATION_EMAIL,
+      replyTo: answers.email,
+      subject: `New ${tier} registration: ${answers.full_name}`,
+      react: SituationRoomTierAdminNotificationEmail({
+        tier,
+        registrationId,
+        fullName: answers.full_name,
+        email: answers.email,
+        contactNumber: `${answers.phone_country} ${answers.phone_number}`,
+        gender: answers.gender,
+        sector: displaySector(answers),
+        businessNiche: answers.business_niche,
+        needsAccommodation: answers.needs_accommodation,
+        willingToPartner: answers.willing_to_partner,
+      }),
+    }),
+  ])
+
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      console.error(`${tier} registration email failed to send:`, result.reason)
+    } else if (result.value.error) {
+      console.error(`${tier} registration email was refused:`, result.value.error)
     }
   }
 }

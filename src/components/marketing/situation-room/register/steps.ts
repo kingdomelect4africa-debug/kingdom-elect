@@ -95,6 +95,8 @@ export const INDUSTRY_OPTIONS = [
   'Other',
 ]
 
+export const PHONE_COUNTRY_CODES = ['+234', '+233', '+254', '+27', '+1', '+44', '+971']
+
 export const EXPERIENCE_OPTIONS = ['0–2 years', '3–5 years', '6–10 years', '11–20 years', '20+ years']
 
 export const SELF_IDENTIFICATION_OPTIONS = [

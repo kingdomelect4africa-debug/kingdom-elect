@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition, type KeyboardEvent
 import { AnimatePresence, motion } from 'motion/react'
 import { cn } from '@/lib/cn'
 import { submitSituationRoomRegistration } from '@/lib/actions/situation-room-registration'
-import { EMPTY_ANSWERS, visibleSteps, type Answers, type Step } from './steps'
+import { EMPTY_ANSWERS, PHONE_COUNTRY_CODES, visibleSteps, type Answers, type Step } from './steps'
 
 const STORAGE_KEY = 'sr-registration-2026'
 
@@ -380,7 +380,7 @@ function StepContent({
               onChange={(e) => update('phone_country', e.target.value)}
               className="border-b border-line-navy-strong bg-transparent pb-3 font-sans text-[1.1rem] text-ivory focus:border-gold focus:outline-none"
             >
-              {['+234', '+233', '+254', '+27', '+1', '+44', '+971'].map((code) => (
+              {PHONE_COUNTRY_CODES.map((code) => (
                 <option key={code} value={code} className="bg-navy-deep">
                   {code}
                 </option>
