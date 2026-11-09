@@ -5,7 +5,7 @@ import { EventForm } from '@/components/admin/events/EventForm'
 
 export default async function NewEventPage() {
   const [forms, chapters] = await Promise.all([
-    prisma.formDefinition.findMany({ select: { id: true, name: true } }),
+    prisma.formDefinition.findMany({ where: { accessTier: null }, select: { id: true, name: true } }),
     prisma.chapter.findMany({ select: { id: true, name: true } }),
   ])
 

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { VvipRegistration } from '@/components/marketing/situation-room/tier/VvipRegistration'
+import { TIER_CONFIRMATION_MESSAGE } from '@/lib/situation-room-tiers'
+import { getTierForm, tierPageFields } from '@/lib/tier-forms'
 
 export const metadata: Metadata = {
   title: 'VVIP Registration — The Situation Room',
@@ -7,6 +9,15 @@ export const metadata: Metadata = {
   robots: { index: false },
 }
 
-export default function SituationRoomVvipPage() {
-  return <VvipRegistration />
+// The questions are edited in the Form Builder, which revalidates this page on save.
+export const revalidate = 60
+
+export default async function SituationRoomVvipPage() {
+  const form = await getTierForm('VVIP')
+  return (
+    <VvipRegistration
+      fields={tierPageFields(form)}
+      confirmationMessage={form.confirmationMessage?.trim() || TIER_CONFIRMATION_MESSAGE}
+    />
+  )
 }

@@ -567,6 +567,10 @@ model FormDefinition {
   confirmationMessage String?
   redirectUrl       String?
   notificationEmails String[]
+  /// "VVIP" or "VIP" on the forms behind /the-situation-room/vvip and /vip.
+  /// Those pages show this form's fields in their own design and save
+  /// submissions as Situation Room Registrations labelled with the tier.
+  accessTier        String?          @unique
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 

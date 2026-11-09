@@ -10,7 +10,7 @@ export default async function NewProgramPage() {
       orderBy: { name: 'asc' },
       select: { id: true, name: true },
     }),
-    prisma.formDefinition.findMany({ select: { id: true, name: true } }),
+    prisma.formDefinition.findMany({ where: { accessTier: null }, select: { id: true, name: true } }),
   ])
 
   return (

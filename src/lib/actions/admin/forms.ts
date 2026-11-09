@@ -6,6 +6,7 @@ import { prisma } from '@/lib/db'
 import { requireUser, type SessionUser } from '@/lib/auth'
 import { slugify } from '@/lib/format'
 import { canManageEvents, canManagePrograms } from '@/lib/rbac'
+import { TIER_PATHS } from '@/lib/situation-room-tiers'
 import type { ConfirmationType, Prisma } from '@prisma/client'
 import type { FormFieldConfig } from '@/lib/forms'
 
@@ -80,6 +81,7 @@ function revalidateFormPaths(formId?: string) {
   revalidatePath('/events/[slug]', 'page')
   revalidatePath('/programs/[slug]', 'page')
   revalidatePath('/forms/[slug]', 'page')
+  for (const path of Object.values(TIER_PATHS)) revalidatePath(path)
 }
 
 export async function createForm(formData: FormData) {
@@ -98,7 +100,9 @@ export async function createForm(formData: FormData) {
 
 export async function updateForm(formId: string, formData: FormData) {
   const user = await requireUser(['EVENTS_MANAGER', 'PROGRAM_MANAGER'])
-  const { events, programs } = attachTargets(user, formData)
+  const { accessTier } = await prisma.formDefinition.findUniqueOrThrow({ where: { id: formId }, select: { accessTier: true } })
+  // The VVIP and VIP forms have their own pages and are never attached elsewhere.
+  const { events, programs } = accessTier ? { events: undefined, programs: undefined } : attachTargets(user, formData)
   // `set` detaches whatever this form was attached to but is no longer
   // checked, and attaches (replacing any other form on) whatever is checked.
   await prisma.formDefinition.update({
@@ -120,6 +124,10 @@ export async function deleteForm(formId: string) {
     where: { id: formId },
     include: { _count: { select: { events: true, programs: true, cohorts: true } } },
   })
+
+  if (form.accessTier) {
+    throw new Error(`"${form.name}" runs the ${form.accessTier} registration page and can't be deleted.`)
+  }
 
   // Deleting a form that's still wired to an Event, Program or Cohort would
   // silently orphan the reference (the FK is nullable, so Prisma wouldn't stop

@@ -4,10 +4,10 @@ import { SituationRoomAdminNotificationEmail } from '@/emails/SituationRoomAdmin
 import type { Answers } from '@/components/marketing/situation-room/register/steps'
 import { SituationRoomTierConfirmationEmail } from '@/emails/SituationRoomTierConfirmation'
 import { SituationRoomTierAdminNotificationEmail } from '@/emails/SituationRoomTierAdminNotification'
-import { asksAccommodation, displaySector, type AccessTier, type TierAnswers } from '@/lib/situation-room-tiers'
+import type { AccessTier } from '@/lib/situation-room-tiers'
 
 const FROM = 'Kingdom E.L.E.C.T. for Africa <registrations@kingdomelect4africa.online>'
-const ADMIN_NOTIFICATION_EMAIL = 'kingdomelect4africa@gmail.com'
+export const ADMIN_NOTIFICATION_EMAIL = 'kingdomelect4africa@gmail.com'
 
 let cachedClient: Resend | null = null
 
@@ -63,48 +63,50 @@ export async function sendSituationRoomEmails(answers: Answers, registrationId: 
 
 /**
  * Same best-effort rules as sendSituationRoomEmails, for the VVIP and VIP
- * forms. The Registration row is already saved when this runs.
+ * forms. The Registration row is already saved when this runs. Their questions
+ * are edited in the Form Builder, so both emails list whatever was asked.
  */
-export async function sendSituationRoomTierEmails(tier: AccessTier, answers: TierAnswers, registrationId: string): Promise<void> {
+export async function sendSituationRoomTierEmails(
+  tier: AccessTier,
+  details: {
+    registrationId: string
+    fullName: string
+    email: string
+    answers: { label: string; value: string }[]
+    confirmationMessage: string
+    /** The form's notification emails; the admin inbox if it has none. */
+    notify: string[]
+  },
+): Promise<void> {
   const resend = getResendClient()
   if (!resend) {
     console.warn(`RESEND_API_KEY not set, skipping ${tier} registration emails.`)
     return
   }
 
-  const accommodation = asksAccommodation(tier)
-    ? { needsAccommodation: answers.needs_accommodation, spouseAttending: answers.spouse_attending }
-    : {}
-
   const results = await Promise.allSettled([
     resend.emails.send({
       from: FROM,
-      to: answers.email,
+      to: details.email,
       replyTo: 'support@kingdomelect4africa.online',
       subject: `Your ${tier} registration: Kingdom E.L.E.C.T. Situation Room`,
       react: SituationRoomTierConfirmationEmail({
         tier,
-        firstName: answers.full_name.split(' ')[0] || answers.full_name,
-        ...accommodation,
-        willingToPartner: answers.willing_to_partner,
+        firstName: details.fullName.split(' ')[0] || details.fullName,
+        confirmationMessage: details.confirmationMessage,
+        answers: details.answers,
       }),
     }),
     resend.emails.send({
       from: FROM,
-      to: ADMIN_NOTIFICATION_EMAIL,
-      replyTo: answers.email,
-      subject: `New ${tier} registration: ${answers.full_name}`,
+      to: details.notify.length > 0 ? details.notify : ADMIN_NOTIFICATION_EMAIL,
+      replyTo: details.email,
+      subject: `New ${tier} registration: ${details.fullName}`,
       react: SituationRoomTierAdminNotificationEmail({
         tier,
-        registrationId,
-        fullName: answers.full_name,
-        email: answers.email,
-        contactNumber: `${answers.phone_country} ${answers.phone_number}`,
-        gender: answers.gender,
-        sector: displaySector(answers),
-        businessNiche: answers.business_niche,
-        ...accommodation,
-        willingToPartner: answers.willing_to_partner,
+        registrationId: details.registrationId,
+        fullName: details.fullName,
+        answers: details.answers,
       }),
     }),
   ])

@@ -1,10 +1,25 @@
+'use client'
+
+import { useState } from 'react'
 import { COUNTRIES } from '@/lib/countries'
-import type { FormFieldConfig } from '@/lib/forms'
+import { asksToSpecify, OTHER_OPTION, otherKey, type FormFieldConfig } from '@/lib/forms'
 
 const inputClasses =
   'w-full border border-border-strong bg-surface px-4 py-3 font-sans text-sm text-ink placeholder:text-ink-muted/60 focus:border-brand-primary focus:outline-none'
 
 export function DynamicField({ field }: { field: FormFieldConfig }) {
+  const [picked, setPicked] = useState('')
+  const specify =
+    asksToSpecify(field) && picked === OTHER_OPTION ? (
+      <input
+        name={otherKey(field.id)}
+        required={field.required}
+        placeholder="Please specify"
+        aria-label={`${field.label}: please specify`}
+        className={`${inputClasses} mt-3`}
+      />
+    ) : null
+
   const label = (
     <label htmlFor={field.id} className="mb-2 block font-sans text-xs font-semibold uppercase text-ink" style={{ letterSpacing: '0.06em' }}>
       {field.label}
@@ -40,7 +55,14 @@ export function DynamicField({ field }: { field: FormFieldConfig }) {
       return (
         <div>
           {label}
-          <select id={field.id} name={field.id} required={field.required} className={inputClasses} defaultValue="">
+          <select
+            id={field.id}
+            name={field.id}
+            required={field.required}
+            className={inputClasses}
+            defaultValue=""
+            onChange={(e) => setPicked(e.target.value)}
+          >
             <option value="" disabled>
               Select an option
             </option>
@@ -50,6 +72,7 @@ export function DynamicField({ field }: { field: FormFieldConfig }) {
               </option>
             ))}
           </select>
+          {specify}
         </div>
       )
     case 'radio':
@@ -62,11 +85,19 @@ export function DynamicField({ field }: { field: FormFieldConfig }) {
           <div className="flex flex-wrap gap-4">
             {(field.options ?? []).map((option) => (
               <label key={option} className="flex items-center gap-2 font-sans text-sm text-ink">
-                <input type="radio" name={field.id} value={option} required={field.required} className="accent-[--color-brand-primary]" />
+                <input
+                  type="radio"
+                  name={field.id}
+                  value={option}
+                  required={field.required}
+                  onChange={() => setPicked(option)}
+                  className="accent-[--color-brand-primary]"
+                />
                 {option}
               </label>
             ))}
           </div>
+          {specify}
         </fieldset>
       )
     case 'checkbox':

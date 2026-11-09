@@ -5,26 +5,12 @@ export function SituationRoomTierAdminNotificationEmail({
   tier,
   registrationId,
   fullName,
-  email,
-  contactNumber,
-  gender,
-  sector,
-  businessNiche,
-  needsAccommodation,
-  spouseAttending,
-  willingToPartner,
+  answers,
 }: {
   tier: AccessTier
   registrationId: string
   fullName: string
-  email: string
-  contactNumber: string
-  gender: string
-  sector: string
-  businessNiche: string
-  needsAccommodation?: string
-  spouseAttending?: string
-  willingToPartner: string
+  answers: { label: string; value: string }[]
 }) {
   return (
     <EmailLayout preview={`New ${tier} registration: ${fullName}`}>
@@ -38,14 +24,9 @@ export function SituationRoomTierAdminNotificationEmail({
 
       <EmailDivider />
 
-      <EmailFieldRow label="Email" value={email} />
-      <EmailFieldRow label="Contact number" value={contactNumber} />
-      <EmailFieldRow label="Gender" value={gender} />
-      <EmailFieldRow label="Sector" value={sector} />
-      <EmailFieldRow label="Business niche" value={businessNiche} />
-      {needsAccommodation && <EmailFieldRow label="Accommodation needed" value={needsAccommodation} />}
-      {spouseAttending && <EmailFieldRow label="Coming with spouse" value={spouseAttending} />}
-      <EmailFieldRow label="Willing to partner or give" value={willingToPartner} />
+      {answers.map((answer, index) => (
+        <EmailFieldRow key={index} label={answer.label} value={answer.value} />
+      ))}
     </EmailLayout>
   )
 }

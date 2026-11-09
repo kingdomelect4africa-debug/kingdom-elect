@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Field, SubmitButton, inputClasses } from '@/components/admin/ui'
 import type { FormDefinition } from '@prisma/client'
-import { isEmailField, type AttachTarget, type FormFieldConfig, type FormFieldType } from '@/lib/forms'
+import { isEmailField, OTHER_OPTION, type AttachTarget, type FormFieldConfig, type FormFieldType } from '@/lib/forms'
 
 const FIELD_TYPES: FormFieldType[] = [
   'text',
@@ -91,6 +91,8 @@ export function FormBuilder({
   initialFields,
   events,
   programs,
+  fieldTypes = FIELD_TYPES,
+  needsEmail = false,
 }: {
   action: (formData: FormData) => Promise<void>
   form?: FormDefinition
@@ -99,8 +101,13 @@ export function FormBuilder({
   events?: AttachTarget[]
   /** Undefined when the current role can't edit programs — hides that list. */
   programs?: AttachTarget[]
+  /** The question types this form can use; the VVIP and VIP pages can't take uploads. */
+  fieldTypes?: FormFieldType[]
+  /** Warn about a missing email question even without the Attach To lists. */
+  needsEmail?: boolean
 }) {
   const [fields, setFields] = useState<FormFieldConfig[]>(initialFields)
+  const warnNoEmail = (needsEmail || Boolean(events || programs)) && !fields.some(isEmailField)
 
   function updateField(index: number, patch: Partial<FormFieldConfig>) {
     setFields((prev) => prev.map((field, i) => (i === index ? { ...field, ...patch } : field)))
@@ -147,12 +154,6 @@ export function FormBuilder({
             Checked events use this as their registration form; checked programs use it as their application form.
             Each event or program takes one form at a time.
           </p>
-          {!fields.some(isEmailField) && (
-            <p className="border border-gold-600 bg-gold-50 px-4 py-3 font-sans text-sm text-gold-800">
-              This form has no email field. Registrations and applications are tied to a person by email, so add one
-              before attaching it — otherwise every submission is rejected.
-            </p>
-          )}
           {events && (
             <AttachList
               heading="Events — registration"
@@ -176,6 +177,13 @@ export function FormBuilder({
 
       <fieldset className="flex flex-col gap-4 border border-border-subtle p-6">
         <legend className="px-2 font-serif text-lg text-brand-primary">Fields</legend>
+
+        {warnNoEmail && (
+          <p className="border border-gold-600 bg-gold-50 px-4 py-3 font-sans text-sm text-gold-800">
+            This form has no email field. Registrations and applications are tied to a person by email, so without one
+            every registration or application through this form is rejected.
+          </p>
+        )}
 
         {fields.length === 0 && (
           <p className="font-sans text-sm text-ink-muted">No fields yet. Add the first one below.</p>
@@ -223,7 +231,7 @@ export function FormBuilder({
                     onChange={(e) => updateField(index, { type: e.target.value as FormFieldType })}
                     className={inputClasses}
                   >
-                    {FIELD_TYPES.map((type) => (
+                    {(fieldTypes.includes(field.type) ? fieldTypes : [...fieldTypes, field.type]).map((type) => (
                       <option key={type} value={type}>
                         {type}
                       </option>
@@ -263,6 +271,17 @@ export function FormBuilder({
                     }
                     className={inputClasses}
                   />
+                  {(field.options ?? []).some((option) => option.trim() === OTHER_OPTION) && (
+                    <label className="mt-2 flex items-center gap-2 font-sans text-sm text-ink">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(field.specifyOther)}
+                        onChange={(e) => updateField(index, { specifyOther: e.target.checked })}
+                        className="h-4 w-4"
+                      />
+                      When &ldquo;{OTHER_OPTION}&rdquo; is picked, ask them to specify
+                    </label>
+                  )}
                 </div>
               )}
 

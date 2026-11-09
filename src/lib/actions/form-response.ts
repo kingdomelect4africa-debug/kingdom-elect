@@ -26,6 +26,7 @@ export async function submitFormResponse(
   })
 
   if (!form) return { status: 'error', message: 'This form could not be found.' }
+  if (form.accessTier) return { status: 'error', message: 'This form is filled in on its own registration page.' }
   // Once attached, the link hands off to the event/program flow, which
   // enforces that event's or program's open/closed status — don't let a stale
   // page bypass that by posting here.

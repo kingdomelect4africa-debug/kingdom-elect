@@ -2,22 +2,17 @@
 
 import Image from 'next/image'
 import { PHONE_COUNTRY_CODES } from '@/components/marketing/situation-room/register/steps'
-import {
-  GENDER_OPTIONS,
-  SECTOR_OPTIONS,
-  SITUATION_ROOM_INTRO as INTRO,
-  TIER_FACTS,
-  TIER_QUESTIONS as Q,
-  YES_NO_OPTIONS,
-  type TierAnswers,
-} from '@/lib/situation-room-tiers'
-import { focusTierField, useTierForm } from './useTierForm'
+import { COUNTRIES } from '@/lib/countries'
+import { asksToSpecify, OTHER_OPTION, otherKey, type FormFieldConfig } from '@/lib/forms'
+import { SITUATION_ROOM_INTRO as INTRO, TIER_FACTS } from '@/lib/situation-room-tiers'
+import { focusTierField, inputAttributes, useTierForm, type TierForm } from './useTierForm'
 
 /**
  * VIP: a bright split screen. The introduction sits on a navy panel with the
  * Earth rising behind it, beside an ivory form of boxed fields and tap-friendly
  * tiles. Everything shares the 6px corner radius. Below 1024px the panel stacks
- * on top of the form.
+ * on top of the form. The questions come from the Form Builder; every question
+ * type has a VIP rendering below.
  */
 
 // Width and side padding stay out of the shared styles: the country code and
@@ -30,6 +25,18 @@ const fieldBox = `w-full px-4 ${fieldShell}`
 
 const fieldLabel = 'mb-2 block font-sans text-[0.92rem] font-semibold leading-snug text-navy'
 
+const tile =
+  'relative flex cursor-pointer items-center rounded-[var(--radius-md)] border border-navy-400/70 bg-ivory-50 font-sans text-navy transition-colors duration-200 hover:border-navy has-[:checked]:border-navy has-[:checked]:bg-navy has-[:checked]:text-ivory has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-navy has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-ivory'
+
+/** Short single-line answers pair up two to a row; everything else is full width. */
+function columnSpan(field: FormFieldConfig): string {
+  if (['email', 'phone', 'number', 'date', 'country'].includes(field.type)) return ''
+  if (field.type === 'radio' && (field.options ?? []).length <= 2 && field.label.length <= 30) {
+    return 'sm:col-span-2 sm:max-w-[calc(50%-0.625rem)]'
+  }
+  return 'sm:col-span-2'
+}
+
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null
   return (
@@ -39,50 +46,195 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   )
 }
 
-function Segmented({
-  name,
-  legend,
-  options,
-  value,
-  error,
-  onChange,
-}: {
-  name: keyof TierAnswers
-  legend: string
-  options: string[]
-  value: string
-  error?: string
-  onChange: (value: string) => void
-}) {
+function LabelText({ field }: { field: FormFieldConfig }) {
   return (
-    <fieldset aria-describedby={error ? `${name}-error` : undefined}>
-      <legend className={fieldLabel}>{legend}</legend>
-      <div className="grid grid-cols-2 gap-2">
-        {options.map((option, index) => (
+    <>
+      {field.label}
+      {!field.required && <span className="ml-1.5 font-normal text-ink-muted">(optional)</span>}
+    </>
+  )
+}
+
+function HelpText({ field }: { field: FormFieldConfig }) {
+  if (!field.helpText) return null
+  return <p className="-mt-1 mb-2 font-sans text-[0.85rem] leading-relaxed text-body">{field.helpText}</p>
+}
+
+/** Radio questions as a row of tiles; dropdowns as wrapping chips. */
+function Choices({ field, form, chips }: { field: FormFieldConfig; form: TierForm; chips: boolean }) {
+  const error = form.errors[field.id]
+  return (
+    <fieldset aria-describedby={error ? `${field.id}-error` : undefined}>
+      <legend className={fieldLabel}>
+        <LabelText field={field} />
+      </legend>
+      <HelpText field={field} />
+      <div className={chips ? 'flex flex-wrap gap-2' : 'grid grid-cols-2 gap-2'}>
+        {(field.options ?? []).map((option, index) => (
           <label
             key={option}
-            className="relative flex min-h-[50px] cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-navy-400/70 bg-ivory-50 px-4 font-sans text-[0.95rem] font-medium text-navy transition-colors duration-200 hover:border-navy active:scale-[0.99] has-[:checked]:border-navy has-[:checked]:bg-navy has-[:checked]:text-ivory has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-navy has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-ivory"
+            className={`${tile} ${chips ? 'min-h-11 px-3.5 text-[0.9rem] active:scale-[0.98]' : 'min-h-[50px] justify-center px-4 text-center text-[0.95rem] font-medium active:scale-[0.99]'}`}
           >
             <input
-              id={`${name}-${index}`}
+              id={`${field.id}-${index}`}
               type="radio"
-              name={name}
+              name={field.id}
               value={option}
-              checked={value === option}
-              onChange={() => onChange(option)}
+              checked={form.answers[field.id] === option}
+              onChange={() => form.update(field.id, option)}
               className="absolute inset-0 cursor-pointer opacity-0"
             />
             {option}
           </label>
         ))}
       </div>
-      <FieldError id={`${name}-error`} message={error} />
+      <FieldError id={`${field.id}-error`} message={error} />
     </fieldset>
   )
 }
 
-export function VipRegistration() {
-  const { answers, errors, submitError, submitted, pending, update, submit } = useTierForm('VIP')
+/** The "please specify" box under a choice whose "Other" is picked. */
+function Specify({ field, form }: { field: FormFieldConfig; form: TierForm }) {
+  if (!asksToSpecify(field) || form.answers[field.id] !== OTHER_OPTION) return null
+  const key = otherKey(field.id)
+  const value = form.answers[key]
+  return (
+    <div className="mt-4">
+      <label htmlFor={key} className={fieldLabel}>
+        Please specify
+      </label>
+      <input
+        id={key}
+        type="text"
+        value={typeof value === 'string' ? value : ''}
+        onChange={(e) => form.update(key, e.target.value)}
+        aria-invalid={Boolean(form.errors[key])}
+        aria-describedby={form.errors[key] ? `${key}-error` : undefined}
+        className={fieldBox}
+      />
+      <FieldError id={`${key}-error`} message={form.errors[key]} />
+    </div>
+  )
+}
+
+function VipField({ field, form }: { field: FormFieldConfig; form: TierForm }) {
+  const value = form.answers[field.id]
+  const text = typeof value === 'string' ? value : ''
+  const error = form.errors[field.id]
+  const errorId = `${field.id}-error`
+  const invalid = { 'aria-invalid': Boolean(error), 'aria-describedby': error ? errorId : undefined }
+
+  if (field.type === 'radio' || field.type === 'dropdown') {
+    return (
+      <div className={columnSpan(field)}>
+        <Choices field={field} form={form} chips={field.type === 'dropdown'} />
+        <Specify field={field} form={form} />
+      </div>
+    )
+  }
+
+  if (field.type === 'checkbox' || field.type === 'consent') {
+    return (
+      <div className={columnSpan(field)}>
+        <label className="flex cursor-pointer items-start gap-3 font-sans text-[0.95rem] leading-snug text-navy">
+          <input
+            id={field.id}
+            type="checkbox"
+            checked={value === true}
+            onChange={(e) => form.update(field.id, e.target.checked)}
+            {...invalid}
+            className="mt-0.5 h-5 w-5 shrink-0 accent-navy"
+          />
+          <span>
+            <LabelText field={field} />
+          </span>
+        </label>
+        {field.helpText && <p className="mt-1.5 pl-8 font-sans text-[0.85rem] leading-relaxed text-body">{field.helpText}</p>}
+        <FieldError id={errorId} message={error} />
+      </div>
+    )
+  }
+
+  let control: React.ReactNode
+  if (field.type === 'phone') {
+    control = (
+      <div className="flex gap-2">
+        <select
+          aria-label="Country code"
+          autoComplete="tel-country-code"
+          value={form.phoneCode(field.id)}
+          onChange={(e) => form.setPhoneCode(field.id, e.target.value)}
+          className={`${fieldShell} w-[5.75rem] shrink-0 px-2.5`}
+        >
+          {PHONE_COUNTRY_CODES.map((code) => (
+            <option key={code} value={code}>
+              {code}
+            </option>
+          ))}
+        </select>
+        <input
+          id={field.id}
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel-national"
+          value={text}
+          onChange={(e) => form.update(field.id, e.target.value)}
+          {...invalid}
+          className={`${fieldShell} min-w-0 flex-1 px-4`}
+        />
+      </div>
+    )
+  } else if (field.type === 'country') {
+    control = (
+      <select id={field.id} value={text} onChange={(e) => form.update(field.id, e.target.value)} {...invalid} className={fieldBox}>
+        <option value="" disabled>
+          Select your country
+        </option>
+        {COUNTRIES.map((country) => (
+          <option key={country} value={country}>
+            {country}
+          </option>
+        ))}
+      </select>
+    )
+  } else if (field.type === 'textarea') {
+    control = (
+      <textarea
+        id={field.id}
+        rows={4}
+        value={text}
+        onChange={(e) => form.update(field.id, e.target.value)}
+        {...invalid}
+        className={`${fieldBox} min-h-[7rem] resize-y leading-relaxed`}
+      />
+    )
+  } else {
+    control = (
+      <input
+        id={field.id}
+        {...inputAttributes(field)}
+        value={text}
+        onChange={(e) => form.update(field.id, e.target.value)}
+        {...invalid}
+        className={`${fieldBox} scroll-mt-6`}
+      />
+    )
+  }
+
+  return (
+    <div className={columnSpan(field)}>
+      <label htmlFor={field.id} className={fieldLabel}>
+        <LabelText field={field} />
+      </label>
+      <HelpText field={field} />
+      {control}
+      <FieldError id={errorId} message={error} />
+    </div>
+  )
+}
+
+export function VipRegistration({ fields, confirmationMessage }: { fields: FormFieldConfig[]; confirmationMessage: string }) {
+  const form = useTierForm('VIP', fields)
 
   return (
     <div className="min-h-[100dvh] bg-ivory text-ink lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
@@ -121,10 +273,10 @@ export function VipRegistration() {
             ))}
           </ul>
 
-          {!submitted && (
+          {!form.submitted && fields.length > 0 && (
             <button
               type="button"
-              onClick={() => focusTierField('full_name')}
+              onClick={() => focusTierField(fields[0].id)}
               className="mt-8 w-full rounded-[var(--radius-md)] bg-gold px-8 py-4 font-sans text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-navy-deep transition-colors duration-200 hover:bg-gold-light active:scale-[0.99] sm:w-fit lg:hidden"
             >
               Begin Registration
@@ -134,13 +286,13 @@ export function VipRegistration() {
       </aside>
 
       <main className="px-6 py-10 sm:px-10 lg:px-16 lg:py-14">
-        {submitted ? (
+        {form.submitted ? (
           <div className="flex min-h-[50dvh] max-w-[34rem] animate-reveal flex-col justify-center lg:min-h-[80dvh]">
             <h2 className="font-serif text-[clamp(1.9rem,4vw,2.7rem)] font-semibold leading-[1.15] text-navy">
               Your VIP registration has been received.
             </h2>
             <p className="mt-5 font-sans leading-[1.8] text-body">
-              Thank you, {answers.full_name.split(' ')[0]}. Our team will contact you directly with the next steps.
+              Thank you{form.firstName ? `, ${form.firstName}` : ''}. {confirmationMessage}
             </p>
             <p className="mt-4 font-serif text-[1.08rem] italic leading-[1.6] text-navy">
               {INTRO.closing} Looking forward to seeing you in the Situation Room.
@@ -152,191 +304,26 @@ export function VipRegistration() {
               Back to The Situation Room
             </a>
           </div>
+        ) : fields.length === 0 ? (
+          <p className="font-serif text-[1.15rem] italic text-navy">Registration opens soon.</p>
         ) : (
-          <form onSubmit={submit} noValidate className="grid max-w-[42rem] gap-x-5 gap-y-7 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label htmlFor="full_name" className={fieldLabel}>
-                {Q.full_name}
-              </label>
-              <input
-                id="full_name"
-                type="text"
-                autoComplete="name"
-                enterKeyHint="next"
-                value={answers.full_name}
-                onChange={(e) => update('full_name', e.target.value)}
-                aria-invalid={Boolean(errors.full_name)}
-                aria-describedby={errors.full_name ? 'full_name-error' : undefined}
-                className={`${fieldBox} scroll-mt-6`}
-              />
-              <FieldError id="full_name-error" message={errors.full_name} />
-            </div>
-
-            <div>
-              <label htmlFor="email" className={fieldLabel}>
-                {Q.email}
-              </label>
-              <input
-                id="email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                enterKeyHint="next"
-                value={answers.email}
-                onChange={(e) => update('email', e.target.value)}
-                aria-invalid={Boolean(errors.email)}
-                aria-describedby={errors.email ? 'email-error' : undefined}
-                className={fieldBox}
-              />
-              <FieldError id="email-error" message={errors.email} />
-            </div>
-
-            <div>
-              <label htmlFor="phone_number" className={fieldLabel}>
-                {Q.phone_number}
-              </label>
-              <div className="flex gap-2">
-                <select
-                  aria-label="Country code"
-                  autoComplete="tel-country-code"
-                  value={answers.phone_country}
-                  onChange={(e) => update('phone_country', e.target.value)}
-                  className={`${fieldShell} w-[5.75rem] shrink-0 px-2.5`}
-                >
-                  {PHONE_COUNTRY_CODES.map((code) => (
-                    <option key={code} value={code}>
-                      {code}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  id="phone_number"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel-national"
-                  value={answers.phone_number}
-                  onChange={(e) => update('phone_number', e.target.value)}
-                  aria-invalid={Boolean(errors.phone_number)}
-                  aria-describedby={errors.phone_number ? 'phone_number-error' : undefined}
-                  className={`${fieldShell} min-w-0 flex-1 px-4`}
-                />
-              </div>
-              <FieldError id="phone_number-error" message={errors.phone_number} />
-            </div>
-
-            <div className="sm:col-span-2 sm:max-w-[calc(50%-0.625rem)]">
-              <Segmented
-                name="gender"
-                legend={Q.gender}
-                options={GENDER_OPTIONS}
-                value={answers.gender}
-                error={errors.gender}
-                onChange={(value) => update('gender', value)}
-              />
-            </div>
-
-            <fieldset className="sm:col-span-2" aria-describedby={errors.sector ? 'sector-error' : undefined}>
-              <legend className={fieldLabel}>{Q.sector}</legend>
-              <div className="flex flex-wrap gap-2">
-                {SECTOR_OPTIONS.map((option, index) => (
-                  <label
-                    key={option}
-                    className="relative flex min-h-11 cursor-pointer items-center rounded-[var(--radius-md)] border border-navy-400/70 bg-ivory-50 px-3.5 font-sans text-[0.9rem] text-navy transition-colors duration-200 hover:border-navy active:scale-[0.98] has-[:checked]:border-navy has-[:checked]:bg-navy has-[:checked]:text-ivory has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-navy has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-ivory"
-                  >
-                    <input
-                      id={`sector-${index}`}
-                      type="radio"
-                      name="sector"
-                      value={option}
-                      checked={answers.sector === option}
-                      onChange={() => update('sector', option)}
-                      className="absolute inset-0 cursor-pointer opacity-0"
-                    />
-                    {option}
-                  </label>
-                ))}
-              </div>
-              <FieldError id="sector-error" message={errors.sector} />
-              {answers.sector === 'Other' && (
-                <div className="mt-4">
-                  <label htmlFor="sector_other" className={fieldLabel}>
-                    {Q.sector_other}
-                  </label>
-                  <input
-                    id="sector_other"
-                    type="text"
-                    value={answers.sector_other}
-                    onChange={(e) => update('sector_other', e.target.value)}
-                    aria-invalid={Boolean(errors.sector_other)}
-                    aria-describedby={errors.sector_other ? 'sector_other-error' : undefined}
-                    className={fieldBox}
-                  />
-                  <FieldError id="sector_other-error" message={errors.sector_other} />
-                </div>
-              )}
-            </fieldset>
+          <form onSubmit={form.submit} noValidate className="grid max-w-[42rem] gap-x-5 gap-y-7 sm:grid-cols-2">
+            {fields.map((field) => (
+              <VipField key={field.id} field={field} form={form} />
+            ))}
 
             <div className="sm:col-span-2">
-              <label htmlFor="business_niche" className={fieldLabel}>
-                {Q.business_niche}
-              </label>
-              <input
-                id="business_niche"
-                type="text"
-                value={answers.business_niche}
-                onChange={(e) => update('business_niche', e.target.value)}
-                aria-invalid={Boolean(errors.business_niche)}
-                aria-describedby={errors.business_niche ? 'business_niche-error' : undefined}
-                className={fieldBox}
-              />
-              <FieldError id="business_niche-error" message={errors.business_niche} />
-            </div>
-
-            <div className="sm:col-span-2">
-              <Segmented
-                name="needs_accommodation"
-                legend={Q.needs_accommodation}
-                options={YES_NO_OPTIONS}
-                value={answers.needs_accommodation}
-                error={errors.needs_accommodation}
-                onChange={(value) => update('needs_accommodation', value)}
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <Segmented
-                name="spouse_attending"
-                legend={Q.spouse_attending}
-                options={YES_NO_OPTIONS}
-                value={answers.spouse_attending}
-                error={errors.spouse_attending}
-                onChange={(value) => update('spouse_attending', value)}
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <Segmented
-                name="willing_to_partner"
-                legend={Q.willing_to_partner}
-                options={YES_NO_OPTIONS}
-                value={answers.willing_to_partner}
-                error={errors.willing_to_partner}
-                onChange={(value) => update('willing_to_partner', value)}
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              {submitError && (
+              {form.submitError && (
                 <p role="alert" className="mb-4 rounded-[var(--radius-md)] border border-red-700/40 bg-red-50 px-4 py-3 font-sans text-sm leading-relaxed text-red-900">
-                  {submitError}
+                  {form.submitError}
                 </p>
               )}
               <button
                 type="submit"
-                disabled={pending}
+                disabled={form.pending}
                 className="w-full rounded-[var(--radius-md)] bg-navy px-10 py-4 font-sans text-[0.82rem] font-semibold uppercase tracking-[0.08em] text-ivory transition-[background,opacity,transform] duration-200 hover:bg-navy-light active:scale-[0.99] disabled:cursor-wait disabled:opacity-60 sm:w-auto"
               >
-                {pending ? 'Submitting...' : 'Submit Registration'}
+                {form.pending ? 'Submitting...' : 'Submit Registration'}
               </button>
             </div>
           </form>

@@ -4,15 +4,13 @@ import type { AccessTier } from '@/lib/situation-room-tiers'
 export function SituationRoomTierConfirmationEmail({
   tier,
   firstName,
-  needsAccommodation,
-  spouseAttending,
-  willingToPartner,
+  confirmationMessage,
+  answers,
 }: {
   tier: AccessTier
   firstName: string
-  needsAccommodation?: string
-  spouseAttending?: string
-  willingToPartner: string
+  confirmationMessage: string
+  answers: { label: string; value: string }[]
 }) {
   return (
     <EmailLayout preview={`Your ${tier} registration for the Situation Room has been received.`}>
@@ -21,8 +19,7 @@ export function SituationRoomTierConfirmationEmail({
       </span>
       <EmailHeading>Thank you, {firstName}.</EmailHeading>
       <EmailText>
-        We have received your {tier} registration for the Kingdom E.L.E.C.T. for Africa Situation Room. Our team will contact you
-        directly with the next steps.
+        We have received your {tier} registration for the Kingdom E.L.E.C.T. for Africa Situation Room. {confirmationMessage}
       </EmailText>
       <EmailText style={{ fontStyle: 'italic', color: colors.navy }}>
         This is not a conference. It is a governance chamber. Looking forward to seeing you in the Situation Room.
@@ -30,9 +27,9 @@ export function SituationRoomTierConfirmationEmail({
 
       <EmailDivider />
 
-      {needsAccommodation && <EmailFieldRow label="Accommodation needed" value={needsAccommodation} />}
-      {spouseAttending && <EmailFieldRow label="Coming with spouse" value={spouseAttending} />}
-      <EmailFieldRow label="Willing to partner or give" value={willingToPartner} />
+      {answers.map((answer, index) => (
+        <EmailFieldRow key={index} label={answer.label} value={answer.value} />
+      ))}
 
       <EmailDivider />
 

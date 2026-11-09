@@ -24,7 +24,7 @@ export default async function EditEventPage({
         _count: { select: { registrations: true } },
       },
     }),
-    prisma.formDefinition.findMany({ select: { id: true, name: true } }),
+    prisma.formDefinition.findMany({ where: { accessTier: null }, select: { id: true, name: true } }),
     prisma.chapter.findMany({ select: { id: true, name: true } }),
     prisma.person.findMany({ orderBy: { firstName: 'asc' }, select: { id: true, firstName: true, lastName: true } }),
   ])

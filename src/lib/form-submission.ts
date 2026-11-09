@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db'
 import { slugify } from '@/lib/format'
-import { isEmailField, type FormFieldConfig } from '@/lib/forms'
+import { asksToSpecify, isEmailField, isValidEmail, OTHER_OPTION, otherKey, type FormFieldConfig } from '@/lib/forms'
 import type { PillarTag } from '@prisma/client'
 
 // Shared by the public registration and application Server Actions. Kept out
@@ -17,12 +17,8 @@ const PILLAR_MAP: Record<string, PillarTag> = {
   Technocrat: 'TECHNOCRAT',
 }
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-/** Text fields labelled "Email" get no browser validation, so check here. */
-export function isValidEmail(email: string): boolean {
-  return EMAIL_PATTERN.test(email)
-}
+// Lives in forms.ts so the browser can use it too; re-exported for the actions.
+export { isValidEmail }
 
 /** Reads every configured field out of the submission, enforcing `required`. */
 export function readResponses(
@@ -49,6 +45,13 @@ export function readResponses(
         return { ok: false, message: `${field.label} is required.` }
       }
       responses[field.id] = value
+      if (asksToSpecify(field) && value === OTHER_OPTION) {
+        const detail = (formData.get(otherKey(field.id)) as string | null)?.trim() ?? ''
+        if (field.required && !detail) {
+          return { ok: false, message: `Please specify: ${field.label}` }
+        }
+        if (detail) responses[field.id] = detail
+      }
     }
   }
 

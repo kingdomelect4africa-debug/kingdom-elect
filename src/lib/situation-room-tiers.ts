@@ -1,13 +1,19 @@
-import { INDUSTRY_OPTIONS, PHONE_COUNTRY_CODES } from '@/components/marketing/situation-room/register/steps'
+import { INDUSTRY_OPTIONS } from '@/components/marketing/situation-room/register/steps'
+import type { FormFieldConfig } from '@/lib/forms'
 
 /**
- * Questions and rules shared by the VVIP and VIP Situation Room forms.
- * Used in the browser and in the server action, so it stays free of
- * server-only imports.
+ * Fixed parts of the VVIP and VIP Situation Room pages. Their questions live in
+ * the Form Builder (a FormDefinition per tier); this file only holds the page
+ * design copy and the questions each form starts with. Used in the browser
+ * too, so it stays free of server-only imports.
  */
 
 export type AccessTier = 'VVIP' | 'VIP'
 export const ACCESS_TIERS: AccessTier[] = ['VVIP', 'VIP']
+
+export function isAccessTier(value: unknown): value is AccessTier {
+  return ACCESS_TIERS.includes(value as AccessTier)
+}
 
 /** Both forms register people for this event. */
 export const TIER_EVENT_SLUG = 'the-situation-room-2026'
@@ -22,14 +28,7 @@ export function tierFormName(tier: AccessTier): string {
   return `${tier} Registration — The Situation Room`
 }
 
-/** Accommodation, and the spouse question that follows it, are VIP only. */
-export function asksAccommodation(tier: AccessTier): boolean {
-  return tier === 'VIP'
-}
-
-export const SECTOR_OPTIONS = INDUSTRY_OPTIONS
-export const GENDER_OPTIONS = ['Male', 'Female']
-export const YES_NO_OPTIONS = ['Yes', 'No']
+export const TIER_CONFIRMATION_MESSAGE = 'Our team will contact you directly with the next steps.'
 
 /** The same introduction as the main registration form. */
 export const SITUATION_ROOM_INTRO = {
@@ -47,127 +46,36 @@ export const TIER_FACTS: Record<AccessTier, string[]> = {
   VIP: [...SHARED_FACTS, 'Shared accommodation for 80'],
 }
 
-export const TIER_QUESTIONS = {
-  full_name: 'Name',
-  email: 'Email',
-  phone_number: 'Contact number',
-  gender: 'Gender',
-  sector: 'Sector',
-  sector_other: 'Please specify your sector',
-  business_niche: 'Business niche',
-  needs_accommodation: 'Will you be needing accommodation?',
-  spouse_attending: 'Will you be coming with your spouse?',
-  willing_to_partner: 'Are you willing to partner with or give towards the Situation Room?',
-}
-
 /**
- * Each form's questions in the order its page shows them, for the read-only
- * view in the admin Form Builder. Keep in step with the two form components.
+ * The questions each form starts with, the first time its FormDefinition is
+ * created. From then on the Form Builder owns them. The ids match the keys the
+ * first VVIP and VIP registrations were saved under, so old and new ones read
+ * the same in the admin.
  */
-export function tierQuestionList(tier: AccessTier): { label: string; answers: string }[] {
-  const Q = TIER_QUESTIONS
+export function defaultTierFields(tier: AccessTier): FormFieldConfig[] {
+  const yesNo = ['Yes', 'No']
+  const accommodation: FormFieldConfig[] =
+    tier === 'VIP'
+      ? [{ id: 'needs_accommodation', type: 'radio', label: 'Will you be needing accommodation?', required: true, options: yesNo }]
+      : []
+
   return [
-    { label: Q.full_name, answers: 'Text' },
-    { label: Q.email, answers: 'Email address' },
-    { label: Q.phone_number, answers: 'Country code and number' },
-    { label: Q.gender, answers: GENDER_OPTIONS.join(' / ') },
-    { label: Q.sector, answers: `One of ${SECTOR_OPTIONS.length} sectors, the same list as the main registration form. "Other" asks them to specify.` },
-    { label: Q.business_niche, answers: 'Text' },
-    ...(asksAccommodation(tier)
-      ? [
-          { label: Q.needs_accommodation, answers: YES_NO_OPTIONS.join(' / ') },
-          { label: Q.spouse_attending, answers: YES_NO_OPTIONS.join(' / ') },
-        ]
-      : []),
-    { label: Q.willing_to_partner, answers: YES_NO_OPTIONS.join(' / ') },
+    { id: 'full_name', type: 'text', label: 'Name', required: true },
+    { id: 'email', type: 'email', label: 'Email', required: true },
+    { id: 'contact_number', type: 'phone', label: 'Contact number', required: true },
+    { id: 'residence', type: 'text', label: 'Current place of residence', required: true },
+    { id: 'gender', type: 'radio', label: 'Gender', required: true, options: ['Male', 'Female'] },
+    { id: 'sector', type: 'dropdown', label: 'Sector', required: true, options: [...INDUSTRY_OPTIONS], specifyOther: true },
+    { id: 'business_niche', type: 'text', label: 'Business niche', required: true },
+    { id: 'attendance_mode', type: 'radio', label: 'Will you be attending online or offline?', required: true, options: ['Online', 'Offline'] },
+    ...accommodation,
+    { id: 'spouse_attending', type: 'radio', label: 'Will you be coming with your spouse?', required: true, options: yesNo },
+    {
+      id: 'willing_to_partner',
+      type: 'radio',
+      label: 'Are you willing to partner with or give towards the Situation Room?',
+      required: true,
+      options: yesNo,
+    },
   ]
-}
-
-export type TierAnswers = {
-  full_name: string
-  email: string
-  phone_country: string
-  phone_number: string
-  gender: string
-  sector: string
-  sector_other: string
-  business_niche: string
-  needs_accommodation: string
-  spouse_attending: string
-  willing_to_partner: string
-}
-
-export type TierErrors = Partial<Record<keyof TierAnswers, string>>
-
-export const EMPTY_TIER_ANSWERS: TierAnswers = {
-  full_name: '',
-  email: '',
-  phone_country: PHONE_COUNTRY_CODES[0],
-  phone_number: '',
-  gender: '',
-  sector: '',
-  sector_other: '',
-  business_niche: '',
-  needs_accommodation: '',
-  spouse_attending: '',
-  willing_to_partner: '',
-}
-
-/** Top-to-bottom order, used to move focus to the first unanswered question. */
-export const TIER_FIELD_ORDER: (keyof TierAnswers)[] = [
-  'full_name',
-  'email',
-  'phone_number',
-  'gender',
-  'sector',
-  'sector_other',
-  'business_niche',
-  'needs_accommodation',
-  'spouse_attending',
-  'willing_to_partner',
-]
-
-const MAX_LENGTH: Partial<Record<keyof TierAnswers, number>> = {
-  full_name: 120,
-  email: 254,
-  phone_number: 24,
-  sector_other: 80,
-  business_niche: 160,
-}
-
-/** Keeps only known fields as trimmed, length-limited strings. Server actions accept any input. */
-export function cleanTierAnswers(raw: unknown): TierAnswers {
-  const source = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>
-  const clean = { ...EMPTY_TIER_ANSWERS }
-  for (const key of Object.keys(clean) as (keyof TierAnswers)[]) {
-    const value = source[key]
-    clean[key] = typeof value === 'string' ? value.trim().slice(0, MAX_LENGTH[key] ?? 40) : ''
-  }
-  clean.email = clean.email.toLowerCase()
-  return clean
-}
-
-export function validateTierAnswers(answers: TierAnswers, tier: AccessTier): TierErrors {
-  const errors: TierErrors = {}
-  const filled = (value: string) => value.trim().length > 0
-
-  if (!filled(answers.full_name)) errors.full_name = 'Please enter your name.'
-  if (!/^\S+@\S+\.\S+$/.test(answers.email.trim())) errors.email = 'Please enter a valid email address.'
-  if (!PHONE_COUNTRY_CODES.includes(answers.phone_country) || answers.phone_number.replace(/\D/g, '').length < 7) {
-    errors.phone_number = 'Please enter your contact number.'
-  }
-  if (!GENDER_OPTIONS.includes(answers.gender)) errors.gender = 'Please select your gender.'
-  if (!SECTOR_OPTIONS.includes(answers.sector)) errors.sector = 'Please select your sector.'
-  if (answers.sector === 'Other' && !filled(answers.sector_other)) errors.sector_other = 'Please tell us your sector.'
-  if (!filled(answers.business_niche)) errors.business_niche = 'Please enter your business niche.'
-  if (asksAccommodation(tier)) {
-    if (!YES_NO_OPTIONS.includes(answers.needs_accommodation)) errors.needs_accommodation = 'Please choose Yes or No.'
-    if (!YES_NO_OPTIONS.includes(answers.spouse_attending)) errors.spouse_attending = 'Please choose Yes or No.'
-  }
-  if (!YES_NO_OPTIONS.includes(answers.willing_to_partner)) errors.willing_to_partner = 'Please choose Yes or No.'
-  return errors
-}
-
-export function displaySector(answers: TierAnswers): string {
-  return answers.sector === 'Other' ? answers.sector_other.trim() || 'Other' : answers.sector
 }

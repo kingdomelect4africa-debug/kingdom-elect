@@ -1,7 +1,9 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { updateForm, deleteForm } from '@/lib/actions/admin/forms'
 import { requireUser } from '@/lib/auth'
+import { canAccessDomain } from '@/lib/rbac'
 import { loadAttachTargets } from '@/lib/form-attachments'
 import { publicOrigin } from '@/lib/site'
 import { formatDate } from '@/lib/format'
@@ -9,7 +11,11 @@ import { PageHeader, SubmitButton } from '@/components/admin/ui'
 import { SavedBanner } from '@/components/admin/SavedBanner'
 import { FormBuilder } from '@/components/admin/forms/FormBuilder'
 import { ShareLink } from '@/components/admin/forms/ShareLink'
-import { fieldLabels, type FormFieldConfig } from '@/lib/forms'
+import { fieldLabels, type FormFieldConfig, type FormFieldType } from '@/lib/forms'
+import { TIER_EVENT_SLUG, TIER_PATHS, isAccessTier } from '@/lib/situation-room-tiers'
+
+// The VVIP and VIP pages have nowhere to store uploads.
+const TIER_FIELD_TYPES: FormFieldType[] = ['text', 'textarea', 'email', 'phone', 'number', 'date', 'country', 'dropdown', 'radio', 'checkbox', 'consent']
 
 const RESPONSES_SHOWN = 200
 
@@ -51,6 +57,17 @@ export default async function EditFormPage({
 
   if (!form) notFound()
 
+  // The forms behind the VVIP and VIP pages: same editor, their own link,
+  // and submissions that land in Registrations rather than on the form.
+  const tier = isAccessTier(form.accessTier) ? form.accessTier : null
+  const [tierEvent, tierRegistrations] = tier
+    ? await Promise.all([
+        prisma.event.findUnique({ where: { slug: TIER_EVENT_SLUG }, select: { title: true } }),
+        prisma.registration.count({ where: { event: { slug: TIER_EVENT_SLUG }, responses: { path: ['access_tier'], equals: tier } } }),
+      ])
+    : [null, 0]
+  const tierEventTitle = tierEvent?.title ?? 'The Situation Room'
+
   const fields = Array.isArray(form.fields) ? (form.fields as unknown as FormFieldConfig[]) : []
   const labels = fieldLabels(form.fields)
   const attached = form._count.events > 0 || form._count.programs > 0 || form._count.cohorts > 0
@@ -77,18 +94,37 @@ export default async function EditFormPage({
     <div>
       <PageHeader
         title={form.name}
-        description={`Used by ${form._count.events} event(s) and ${form._count.programs} program(s).`}
+        description={
+          tier
+            ? `The ${tier} registration page for ${tierEventTitle}. ${tierRegistrations} registration(s) so far.`
+            : `Used by ${form._count.events} event(s) and ${form._count.programs} program(s).`
+        }
+        actions={
+          tier && canAccessDomain(user, 'events') ? (
+            <Link
+              href={`/admin/registrations?tier=${tier}`}
+              className="font-sans text-xs font-semibold uppercase text-brand-primary underline-offset-4 hover:underline"
+              style={{ letterSpacing: '0.06em' }}
+            >
+              View Registrations →
+            </Link>
+          ) : undefined
+        }
       />
       <SavedBanner saved={saved === '1'} />
 
       <section className="mb-8 max-w-3xl border border-border-subtle p-6">
         <h2 className="font-serif text-lg text-brand-primary">Share Link</h2>
         <div className="mt-4">
-          <ShareLink url={formUrl} />
+          <ShareLink url={tier ? `${origin}${TIER_PATHS[tier]}` : formUrl} />
         </div>
-        <p className="mt-3 font-sans text-sm text-ink-muted">{linkNote}</p>
+        <p className="mt-3 font-sans text-sm text-ink-muted">
+          {tier
+            ? `The questions below appear on this page in its ${tier} design. Each submission is recorded as a registration for ${tierEventTitle}, labelled ${tier}.`
+            : linkNote}
+        </p>
 
-        {linkTargets > 1 && (
+        {!tier && linkTargets > 1 && (
           <div className="mt-5 flex flex-col gap-4 border-t border-border-subtle pt-5">
             <p className="font-sans text-sm text-ink">Or share a direct link that skips that choice:</p>
             {form.events.map((event) => (
@@ -105,11 +141,13 @@ export default async function EditFormPage({
         action={updateForm.bind(null, form.id)}
         form={form}
         initialFields={fields}
-        events={events}
-        programs={programs}
+        events={tier ? undefined : events}
+        programs={tier ? undefined : programs}
+        fieldTypes={tier ? TIER_FIELD_TYPES : undefined}
+        needsEmail={Boolean(tier)}
       />
 
-      {(form.submissions.length > 0 || linkTargets === 0) && (
+      {!tier && (form.submissions.length > 0 || linkTargets === 0) && (
         <section className="mt-10 max-w-3xl border border-border-subtle p-6">
           <h2 className="font-serif text-lg text-brand-primary">Responses ({form._count.submissions})</h2>
           {linkTargets > 0 && (
@@ -159,7 +197,11 @@ export default async function EditFormPage({
       )}
 
       <div className="mt-8 max-w-3xl">
-        {attached ? (
+        {tier ? (
+          <p className="border border-dashed border-border-strong p-4 font-sans text-sm text-ink-muted">
+            This form runs the {tier} registration page, so it can&rsquo;t be deleted.
+          </p>
+        ) : attached ? (
           <p className="border border-dashed border-border-strong p-4 font-sans text-sm text-ink-muted">
             This form can&rsquo;t be deleted while it&rsquo;s attached to {form._count.events} event(s),{' '}
             {form._count.programs} program(s) or {form._count.cohorts} cohort(s). Uncheck them under Attach To first.

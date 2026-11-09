@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
@@ -9,6 +9,7 @@ import { RegistrationForm } from '@/components/marketing/forms/RegistrationForm'
 import { ApplicationForm } from '@/components/marketing/forms/ApplicationForm'
 import { StandaloneForm } from '@/components/marketing/forms/StandaloneForm'
 import type { FormFieldConfig } from '@/lib/forms'
+import { TIER_PATHS, isAccessTier } from '@/lib/situation-room-tiers'
 
 type SearchParams = Promise<{ event?: string; program?: string }>
 
@@ -82,6 +83,8 @@ export default async function FormLinkPage({
   const { slug } = await params
   const form = await getForm(slug)
   if (!form) notFound()
+  // The VVIP and VIP forms are only ever filled in on their own designed pages.
+  if (isAccessTier(form.accessTier)) redirect(TIER_PATHS[form.accessTier])
 
   const target = resolveTarget(form, await searchParams)
   if (!target) notFound()
