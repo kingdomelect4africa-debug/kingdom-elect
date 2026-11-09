@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { ReadingProgress, Reveal, SplitWords } from '@/components/motion/primitives'
 import { formatDate } from '@/lib/format'
 
 export const revalidate = 60
@@ -36,12 +37,14 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   return (
     <article className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(4.5rem,9vw,8.5rem)]">
       <SetNavTone tone="light" />
+      <ReadingProgress />
       <Container>
         <div className="mx-auto max-w-[680px]">
           <Kicker>{CATEGORY_LABELS[article.category] ?? article.category}</Kicker>
-          <h1 className="mt-4 font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
-            {article.title}
+          <h1 className="mt-4 font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.1] text-ink">
+            <SplitWords text={article.title} delay={0.1} />
           </h1>
+          <Reveal delay={0.35} y={16}>
           {article.subtitle && <p className="mt-5 font-sans text-[1.1rem] text-body">{article.subtitle}</p>}
 
           <div
@@ -58,8 +61,11 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
               </>
             )}
           </div>
+          </Reveal>
 
-          <div className="mt-10 whitespace-pre-line font-sans text-[1.05rem] leading-[1.85] text-body">{article.body}</div>
+          <Reveal delay={0.5} y={20} amount={0.05}>
+            <div className="mt-10 whitespace-pre-line font-sans text-[1.05rem] leading-[1.85] text-body">{article.body}</div>
+          </Reveal>
         </div>
       </Container>
     </article>

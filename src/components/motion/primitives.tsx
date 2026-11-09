@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, useEffect, useRef } from 'react'
-import { animate, motion, MotionConfig, useInView } from 'motion/react'
+import { animate, motion, MotionConfig, useInView, useScroll } from 'motion/react'
 import { cn } from '@/lib/cn'
 
 /**
@@ -154,5 +154,37 @@ export function CountUp({ value, className }: { value: string; className?: strin
     <span ref={ref} className={cn('tabular-nums', className)}>
       {value}
     </span>
+  )
+}
+
+/**
+ * Lets every `.spotlight` card inside it carry a soft gold light that
+ * follows the pointer (the glow itself is CSS, in globals.css). One listener
+ * for the whole group, so the cards themselves can stay server-rendered.
+ */
+export function SpotlightGroup({ children, className }: { children: React.ReactNode; className?: string }) {
+  function follow(event: React.PointerEvent<HTMLDivElement>) {
+    const card = (event.target as HTMLElement).closest<HTMLElement>('.spotlight')
+    if (!card) return
+    const box = card.getBoundingClientRect()
+    card.style.setProperty('--spot-x', `${event.clientX - box.left}px`)
+    card.style.setProperty('--spot-y', `${event.clientY - box.top}px`)
+  }
+  return (
+    <div className={className} onPointerMove={follow}>
+      {children}
+    </div>
+  )
+}
+
+/** A thin gold bar along the top of the window showing how far through the page the reader is. */
+export function ReadingProgress() {
+  const { scrollYProgress } = useScroll()
+  return (
+    <motion.div
+      className="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left bg-gold"
+      style={{ scaleX: scrollYProgress }}
+      aria-hidden="true"
+    />
   )
 }

@@ -30,7 +30,7 @@ export default async function AboutPage() {
 
   return (
     <>
-      <SetNavTone tone="light" />
+      <SetNavTone tone="dark" />
       <AboutHero heading={content.heroHeading} body={content.heroBody} />
       <StoryAcronym heading={content.storyHeading} body={content.storyBody} />
       <Statements

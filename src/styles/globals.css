@@ -79,3 +79,27 @@ html {
     transform: none !important;
   }
 }
+
+/* A soft light that follows the pointer across a card (see SpotlightGroup).
+   --spot-color can be overridden per card. */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+  background: radial-gradient(
+    340px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    var(--spot-color, rgba(201, 146, 24, 0.12)),
+    transparent 62%
+  );
+}
+.spotlight:hover::after {
+  opacity: 1;
+}

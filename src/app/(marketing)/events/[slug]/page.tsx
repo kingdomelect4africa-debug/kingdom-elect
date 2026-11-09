@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Kicker } from '@/components/ui/Section'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { HeroFacts, PageHero } from '@/components/marketing/PageHero'
+import { Reveal } from '@/components/motion/primitives'
 import { RegistrationForm } from '@/components/marketing/forms/RegistrationForm'
 import { ArticleCard } from '@/components/marketing/ArticleCard'
 import { formatDateRange, countryName } from '@/lib/format'
@@ -52,50 +53,33 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <>
-      <SetNavTone tone="light" />
+      <SetNavTone tone="dark" />
+      <PageHero id="event" eyebrow={TYPE_LABELS[event.type] ?? event.type} title={event.title} intro={event.summary} motif="arcs">
+        <HeroFacts
+          facts={[
+            { label: 'Dates', value: formatDateRange(event.startDate, event.endDate) },
+            {
+              label: 'Location',
+              value: event.isVirtual
+                ? 'Virtual'
+                : [event.venueName, event.venueCity, countryName(event.venueCountry)].filter(Boolean).join(', ') || 'To be announced',
+            },
+            ...(event.capacity ? [{ label: 'Capacity', value: `${event.capacity} delegates` }] : []),
+          ]}
+        />
+      </PageHero>
 
-      <section className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(2.5rem,5vw,3.5rem)]">
-        <Container>
-          <Kicker>{TYPE_LABELS[event.type] ?? event.type}</Kicker>
-          <h1 className="mt-4 max-w-[780px] font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
-            {event.title}
-          </h1>
-          <p className="mt-5 max-w-[560px] font-sans text-[1.05rem] leading-[1.8] text-body">{event.summary}</p>
-
-          <div className="mt-8 flex flex-wrap gap-6 border-t border-line pt-8">
-            <div className="font-sans text-[0.82rem] text-body">
-              <strong className="block font-sans text-[0.92rem] font-semibold text-ink">
-                {formatDateRange(event.startDate, event.endDate)}
-              </strong>
-              Dates
-            </div>
-            <div className="font-sans text-[0.82rem] text-body">
-              <strong className="block font-sans text-[0.92rem] font-semibold text-ink">
-                {event.isVirtual
-                  ? 'Virtual'
-                  : [event.venueName, event.venueCity, countryName(event.venueCountry)].filter(Boolean).join(', ') || 'To be announced'}
-              </strong>
-              Location
-            </div>
-            {event.capacity && (
-              <div className="font-sans text-[0.82rem] text-body">
-                <strong className="block font-sans text-[0.92rem] font-semibold text-ink">{event.capacity} delegates</strong>
-                Capacity
-              </div>
-            )}
-          </div>
-        </Container>
-      </section>
-
-      <section className="bg-ivory pb-[clamp(4.5rem,9vw,8.5rem)]">
+      <section className="bg-ivory py-[clamp(4rem,8vw,6.5rem)]">
         <Container>
           <div className="grid gap-16 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <h2 className="font-serif text-2xl font-semibold text-ink">Overview</h2>
-              <p className="mt-4 whitespace-pre-line font-sans leading-[1.8] text-body">{event.description}</p>
+              <Reveal>
+                <h2 className="font-serif text-2xl font-semibold text-ink">Overview</h2>
+                <p className="mt-4 whitespace-pre-line font-sans leading-[1.8] text-body">{event.description}</p>
+              </Reveal>
 
               {event.speakers.length > 0 && (
-                <div className="mt-16">
+                <Reveal className="mt-16">
                   <h2 className="font-serif text-2xl font-semibold text-ink">Speakers</h2>
                   <div className="mt-6 grid gap-6 sm:grid-cols-2">
                     {event.speakers.map((speaker) => (
@@ -109,11 +93,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
                       </div>
                     ))}
                   </div>
-                </div>
+                </Reveal>
               )}
 
               {event.sessions.length > 0 && (
-                <div className="mt-16">
+                <Reveal className="mt-16">
                   <h2 className="font-serif text-2xl font-semibold text-ink">Agenda</h2>
                   <div className="mt-6 divide-y divide-line border-t border-line">
                     {event.sessions.map((session) => (
@@ -132,23 +116,23 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
                       </div>
                     ))}
                   </div>
-                </div>
+                </Reveal>
               )}
 
               {event.articles.length > 0 && (
-                <div className="mt-16">
+                <Reveal className="mt-16">
                   <h2 className="font-serif text-2xl font-semibold text-ink">Related Intelligence</h2>
                   <div className="mt-4">
                     {event.articles.map((article) => (
                       <ArticleCard key={article.slug} article={article} />
                     ))}
                   </div>
-                </div>
+                </Reveal>
               )}
             </div>
 
             <div className="lg:col-span-4 lg:col-start-9">
-              <div className="rounded-[var(--radius-md)] border border-line p-[1.75rem]">
+              <Reveal delay={0.1} amount={0.02} className="rounded-[var(--radius-md)] border border-line bg-ivory p-[1.75rem] shadow-[0_30px_70px_-45px_rgba(11,31,58,0.45)] lg:sticky lg:top-28">
                 <h2 className="font-serif text-xl font-semibold text-ink">Register</h2>
                 {event.registrationStatus === 'CLOSED' ? (
                   <p className="mt-4 font-sans text-sm text-body">Registration for this event is closed.</p>
@@ -159,7 +143,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
                 ) : (
                   <p className="mt-4 font-sans text-sm text-body">Registration is not yet configured for this event.</p>
                 )}
-              </div>
+              </Reveal>
             </div>
           </div>
         </Container>

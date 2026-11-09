@@ -16,11 +16,15 @@ export function EventCard({
   }
 }) {
   return (
-    <div className="border-t border-line py-[1.4rem] first-of-type:border-t-0">
+    <div className="group relative border-t border-line py-[1.4rem] transition-[padding] duration-500 ease-[var(--ease-signature)] first-of-type:border-t-0 hover:pl-5">
+      <span
+        className="absolute bottom-[1.4rem] left-0 top-[1.4rem] w-[2px] origin-top scale-y-0 bg-gold transition-transform duration-500 ease-[var(--ease-signature)] group-hover:scale-y-100"
+        aria-hidden="true"
+      />
       <span className="font-sans text-[0.68rem] font-bold uppercase text-emerald" style={{ letterSpacing: '0.1em' }}>
         {TYPE_LABELS[event.type] ?? event.type}
       </span>
-      <h4 className="mt-1 font-serif text-[1.05rem] font-semibold text-ink">{event.title}</h4>
+      <h4 className="mt-1 font-serif text-[1.05rem] font-semibold text-ink transition-colors duration-300 group-hover:text-gold-dark">{event.title}</h4>
       <p className="mt-2 font-sans text-[0.88rem] text-body">{event.summary}</p>
       <div className="mt-[0.9rem] flex items-center gap-[0.9rem] font-sans text-[0.78rem] text-body">
         {formatDateRange(event.startDate, event.endDate)} · {event.isVirtual ? 'Virtual' : event.venueCity ?? 'TBA'}

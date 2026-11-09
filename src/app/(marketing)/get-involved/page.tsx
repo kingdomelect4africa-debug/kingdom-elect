@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { PageHero } from '@/components/marketing/PageHero'
 import { InquiryForm } from '@/components/marketing/forms/InquiryForm'
+import { Reveal, SpotlightGroup } from '@/components/motion/primitives'
 import { cn } from '@/lib/cn'
 
 export const metadata: Metadata = {
@@ -107,83 +109,85 @@ export default async function GetInvolvedPage({
 
   return (
     <>
-      <SetNavTone tone="light" />
+      <SetNavTone tone="dark" />
+      <PageHero
+        id="get-involved"
+        eyebrow="Get Involved"
+        title="This is not a spectator movement."
+        intro="Kingdom E.L.E.C.T. is built for those already producing measurable impact within their sphere, and ready to convert isolated excellence into collective influence."
+        motif="network"
+      />
 
-      <section className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(2.5rem,5vw,3.5rem)]">
+      <section className="bg-ivory py-[clamp(4rem,8vw,6.5rem)]">
         <Container>
-          <Kicker>Get Involved</Kicker>
-          <h1 className="mt-4 max-w-[780px] font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
-            This is not a spectator movement.
-          </h1>
-          <p className="mt-5 max-w-[560px] font-sans text-[1.05rem] leading-[1.8] text-body">
-            Kingdom E.L.E.C.T. is built for those already producing measurable impact within their sphere, and ready
-            to convert isolated excellence into collective influence.
-          </p>
-        </Container>
-      </section>
-
-      <section className="bg-ivory pb-[clamp(4.5rem,9vw,8.5rem)]">
-        <Container>
-          <div className="grid grid-cols-1 gap-px border border-line bg-line min-[621px]:grid-cols-2 min-[981px]:grid-cols-4">
-            {INTEREST_OPTIONS.map((option) => {
+          <SpotlightGroup className="grid grid-cols-1 gap-px border border-line bg-line min-[621px]:grid-cols-2 min-[981px]:grid-cols-4">
+            {INTEREST_OPTIONS.map((option, i) => {
               const active = matched?.slug === option.slug
               return (
-                <a
-                  key={option.slug}
-                  href={`/get-involved?interest=${option.slug}#form`}
-                  className={cn(
-                    'group relative px-6 py-[1.9rem] text-left transition-colors duration-300',
-                    active ? 'bg-navy' : 'bg-ivory hover:bg-navy',
-                  )}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
+                <Reveal key={option.slug} delay={(i % 4) * 0.07} y={18} className="flex">
+                  <a
+                    href={`/get-involved?interest=${option.slug}#form`}
                     className={cn(
-                      'mb-[1.1rem] h-[30px] w-[30px] transition-colors duration-300',
-                      active ? 'text-gold-light' : 'text-gold-dark group-hover:text-gold-light',
+                      'spotlight group w-full px-6 py-[1.9rem] text-left transition-colors duration-500 [--spot-color:rgba(227,185,78,0.16)]',
+                      active ? 'bg-navy' : 'bg-ivory hover:bg-navy',
                     )}
                   >
-                    {option.icon}
-                  </svg>
-                  <h4
-                    className={cn(
-                      'font-serif text-base font-semibold transition-colors duration-300',
-                      active ? 'text-ivory' : 'text-ink group-hover:text-ivory',
-                    )}
-                  >
-                    {option.label}
-                  </h4>
-                  <p
-                    className={cn(
-                      'mt-2 font-sans text-[0.82rem] leading-[1.55] transition-colors duration-300',
-                      active ? 'text-body-on-navy' : 'text-body group-hover:text-body-on-navy',
-                    )}
-                  >
-                    {option.description}
-                  </p>
-                </a>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      className={cn(
+                        'mb-[1.1rem] h-[30px] w-[30px] transition-[color,transform] duration-500 ease-[var(--ease-signature)] group-hover:-translate-y-1 group-hover:scale-110',
+                        active ? 'text-gold-light' : 'text-gold-dark group-hover:text-gold-light',
+                      )}
+                    >
+                      {option.icon}
+                    </svg>
+                    <h4
+                      className={cn(
+                        'font-serif text-base font-semibold transition-colors duration-500',
+                        active ? 'text-ivory' : 'text-ink group-hover:text-ivory',
+                      )}
+                    >
+                      {option.label}
+                    </h4>
+                    <p
+                      className={cn(
+                        'mt-2 font-sans text-[0.82rem] leading-[1.55] transition-colors duration-500',
+                        active ? 'text-body-on-navy' : 'text-body group-hover:text-body-on-navy',
+                      )}
+                    >
+                      {option.description}
+                    </p>
+                    <span
+                      className={cn(
+                        'mt-5 block h-px w-8 origin-left bg-gold transition-transform duration-500 ease-[var(--ease-signature)]',
+                        active ? 'scale-x-[3]' : 'scale-x-100 group-hover:scale-x-[3]',
+                      )}
+                      aria-hidden="true"
+                    />
+                  </a>
+                </Reveal>
               )
             })}
-          </div>
+          </SpotlightGroup>
         </Container>
       </section>
 
-      <section id="form" className="bg-ivory-dim py-[clamp(4.5rem,9vw,8.5rem)]">
+      <section id="form" className="scroll-mt-20 bg-ivory-dim py-[clamp(4.5rem,9vw,8.5rem)]">
         <Container>
           <div className="mx-auto max-w-[820px]">
-            <Kicker>Take Your Position</Kicker>
-            <h2 className="mt-4 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-semibold text-ink">
-              Tell us where you fit.
-            </h2>
-            <div className="mt-8">
+            <Reveal>
+              <Kicker>Take Your Position</Kicker>
+              <h2 className="mt-4 font-serif text-[clamp(1.9rem,3.6vw,2.8rem)] font-semibold leading-[1.12] text-ink">Tell us where you fit.</h2>
+            </Reveal>
+            <Reveal delay={0.1} className="mt-8">
               <InquiryForm
                 typeOptions={INTEREST_OPTIONS.map(({ value, label }) => ({ value, label }))}
                 defaultType={defaultType}
               />
-            </div>
+            </Reveal>
           </div>
         </Container>
       </section>

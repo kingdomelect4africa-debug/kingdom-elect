@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/db'
 import { SetNavTone } from '@/components/marketing/NavTone'
-import { MotionProvider } from '@/components/motion/primitives'
 import { Hero } from '@/components/marketing/home/Hero'
 import { DefiningMoment } from '@/components/marketing/home/DefiningMoment'
 import { KingdomFramework } from '@/components/marketing/home/KingdomFramework'
@@ -98,7 +97,7 @@ export default async function HomePage() {
   const related = Object.fromEntries(relatedEntries) as Record<string, PillarRelated>
 
   return (
-    <MotionProvider>
+    <>
       <SetNavTone tone="dark" />
       <Hero
         eyebrow={content.heroEyebrow}
@@ -128,6 +127,6 @@ export default async function HomePage() {
         ctaLabel={content.participationCtaLabel}
         ctaHref={content.participationCtaHref}
       />
-    </MotionProvider>
+    </>
   )
 }

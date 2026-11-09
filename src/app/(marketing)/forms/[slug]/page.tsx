@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Kicker } from '@/components/ui/Section'
+import { PageHero } from '@/components/marketing/PageHero'
+import { Reveal } from '@/components/motion/primitives'
 import { SetNavTone } from '@/components/marketing/NavTone'
 import { RegistrationForm } from '@/components/marketing/forms/RegistrationForm'
 import { ApplicationForm } from '@/components/marketing/forms/ApplicationForm'
@@ -151,27 +152,25 @@ export default async function FormLinkPage({
 
   return (
     <>
-      <SetNavTone tone="light" />
+      <SetNavTone tone="dark" />
+      <PageHero id="form" eyebrow={kicker} title={title} intro={summary} motif="arcs">
+        {target.kind === 'event' && (
+          <Link href={`/events/${target.event.slug}`} className="mt-6 inline-block font-sans text-sm text-gold-light underline-offset-4 hover:underline">
+            View event details →
+          </Link>
+        )}
+        {target.kind === 'program' && (
+          <Link href={`/programs/${target.program.slug}`} className="mt-6 inline-block font-sans text-sm text-gold-light underline-offset-4 hover:underline">
+            View program details →
+          </Link>
+        )}
+      </PageHero>
 
-      <section className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(4.5rem,9vw,8.5rem)]">
+      <section className="bg-ivory pb-[clamp(4.5rem,9vw,8.5rem)] pt-[clamp(3rem,6vw,4.5rem)]">
         <Container>
-          <div className="mx-auto max-w-[640px]">
-            <Kicker>{kicker}</Kicker>
-            <h1 className="mt-4 font-serif text-[clamp(2rem,4.5vw,3rem)] font-semibold leading-[1.12] text-ink">{title}</h1>
-            {summary && <p className="mt-5 font-sans text-[1.05rem] leading-[1.8] text-body">{summary}</p>}
-            {target.kind === 'event' && (
-              <Link href={`/events/${target.event.slug}`} className="mt-4 inline-block font-sans text-sm text-brand-primary underline-offset-4 hover:underline">
-                View event details →
-              </Link>
-            )}
-            {target.kind === 'program' && (
-              <Link href={`/programs/${target.program.slug}`} className="mt-4 inline-block font-sans text-sm text-brand-primary underline-offset-4 hover:underline">
-                View program details →
-              </Link>
-            )}
-
-            <div className="mt-10 rounded-[var(--radius-md)] border border-line p-[1.75rem] sm:p-10">{body}</div>
-          </div>
+          <Reveal amount={0.02} className="mx-auto max-w-[680px] rounded-[var(--radius-md)] border border-line bg-ivory p-[1.75rem] shadow-[0_30px_70px_-45px_rgba(11,31,58,0.45)] sm:p-10">
+            {body}
+          </Reveal>
         </Container>
       </section>
     </>

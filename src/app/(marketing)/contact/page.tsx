@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Kicker } from '@/components/ui/Section'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { PageHero } from '@/components/marketing/PageHero'
 import { InquiryForm } from '@/components/marketing/forms/InquiryForm'
+import { Reveal } from '@/components/motion/primitives'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -22,61 +23,41 @@ const CONTACT_OPTIONS = [
 
 export default async function ContactPage() {
   const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } })
+  const details = [
+    { label: 'Email', value: settings?.contactEmail },
+    { label: 'Support', value: settings?.supportEmail },
+    { label: 'Phone', value: settings?.contactPhone },
+    { label: 'Address', value: settings?.address },
+  ].filter((detail): detail is { label: string; value: string } => Boolean(detail.value))
 
   return (
     <>
-      <SetNavTone tone="light" />
+      <SetNavTone tone="dark" />
+      <PageHero
+        id="contact"
+        eyebrow="Contact"
+        title="Let’s talk."
+        intro="For urgent matters, reach us directly using the details below. Otherwise, use the form and our team will route your message to the right desk."
+        motif="arcs"
+      />
 
-      <section className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(4.5rem,9vw,8.5rem)]">
+      <section className="bg-ivory py-[clamp(4rem,8vw,6.5rem)]">
         <Container>
           <div className="grid gap-[clamp(2.5rem,6vw,5rem)] lg:grid-cols-[0.8fr_1.2fr]">
-            <div>
-              <Kicker>Contact</Kicker>
-              <h1 className="mt-4 font-serif text-[clamp(2.2rem,4.4vw,3.2rem)] font-semibold leading-[1.12] text-ink">
-                Let&rsquo;s talk.
-              </h1>
-              <p className="mt-6 max-w-[340px] font-sans text-[1.05rem] leading-[1.8] text-body">
-                For urgent matters, reach us directly using the details below. Otherwise, use the form and our team
-                will route your message to the right desk.
-              </p>
-
-              {settings?.contactEmail && (
-                <div className="mt-7">
-                  <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
-                    Email
+            <div className="flex flex-col gap-7">
+              {details.map((detail, i) => (
+                <Reveal key={detail.label} delay={i * 0.08} y={16} className="border-t border-line pt-5">
+                  <span className="font-sans text-[0.7rem] font-semibold uppercase text-body" style={{ letterSpacing: '0.1em' }}>
+                    {detail.label}
                   </span>
-                  <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.contactEmail}</div>
-                </div>
-              )}
-              {settings?.supportEmail && (
-                <div className="mt-7">
-                  <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
-                    Support
-                  </span>
-                  <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.supportEmail}</div>
-                </div>
-              )}
-              {settings?.contactPhone && (
-                <div className="mt-7">
-                  <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
-                    Phone
-                  </span>
-                  <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.contactPhone}</div>
-                </div>
-              )}
-              {settings?.address && (
-                <div className="mt-7">
-                  <span className="font-sans text-[0.7rem] uppercase text-body" style={{ letterSpacing: '0.1em' }}>
-                    Address
-                  </span>
-                  <div className="mt-[0.4rem] font-serif text-[1.1rem] text-ink">{settings.address}</div>
-                </div>
-              )}
+                  <div className="mt-[0.4rem] break-words font-serif text-[1.15rem] text-ink">{detail.value}</div>
+                </Reveal>
+              ))}
             </div>
 
-            <div>
+            <Reveal delay={0.1}>
               <InquiryForm typeOptions={CONTACT_OPTIONS} />
-            </div>
+            </Reveal>
           </div>
         </Container>
       </section>

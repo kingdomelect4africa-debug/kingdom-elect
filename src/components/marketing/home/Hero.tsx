@@ -7,9 +7,8 @@ import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { Kicker } from '@/components/ui/Section'
 import { KingdomGrid } from '@/components/devices/KingdomGrid'
+import { RisingPillars } from '@/components/devices/RisingPillars'
 import { EASE_OUT, SplitWords } from '@/components/motion/primitives'
-
-const PILLARS = [22, 38, 54, 72, 94]
 
 // Drifting gold motes, placed by a fixed-seed generator so the server and
 // the browser render the same positions.
@@ -195,25 +194,8 @@ export function Hero({
         style={{ y: pillarsY }}
         aria-hidden="true"
       >
-        <motion.div className="flex h-full items-end gap-[clamp(6px,1vw,14px)]" style={{ x: pillarsX }}>
-          {PILLARS.map((height, i) => (
-            <motion.span
-              key={height}
-              className="block w-[clamp(6px,1.1vw,16px)] origin-bottom"
-              style={{ height: `${height}%` }}
-              initial={{ scaleY: 0, opacity: 0 }}
-              animate={{ scaleY: 1, opacity: 0.9 }}
-              transition={{ duration: 1.5, delay: 0.5 + i * 0.13, ease: EASE_OUT }}
-            >
-              <span
-                className="block h-full w-full origin-bottom rounded-t-[2px]"
-                style={{
-                  background: 'linear-gradient(180deg, var(--color-gold-light), var(--color-gold) 70%, transparent)',
-                  animation: `pillar-breathe 4.6s ease-in-out ${2.4 + i * 0.25}s infinite`,
-                }}
-              />
-            </motion.span>
-          ))}
+        <motion.div className="h-full" style={{ x: pillarsX }}>
+          <RisingPillars className="h-full" />
         </motion.div>
       </motion.div>
 

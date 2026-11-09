@@ -1,8 +1,10 @@
 'use client'
 
 import { createContext, useContext, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { cn } from '@/lib/cn'
 import { ArticleCard } from '@/components/marketing/ArticleCard'
+import { EASE_OUT } from '@/components/motion/primitives'
 
 type ArticleListItem = {
   title: string
@@ -39,10 +41,27 @@ function useCategoryFilter() {
   return ctx
 }
 
-function pillClasses(isActive: boolean) {
-  return cn(
-    'rounded-full border px-[1.15rem] py-2 font-sans text-[0.78rem] font-semibold transition-all duration-300 ease-[var(--ease-signature)]',
-    isActive ? 'border-navy bg-navy text-ivory' : 'border-line-strong text-body hover:border-ink hover:text-ink',
+/** For the navy page hero: the active pill's gold wash slides between choices. */
+function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        'relative isolate rounded-full border px-[1.15rem] py-2 font-sans text-[0.78rem] font-semibold transition-colors duration-300',
+        active ? 'border-gold text-navy-deep' : 'border-line-navy-strong text-body-on-navy hover:border-ivory hover:text-ivory',
+      )}
+    >
+      {active && (
+        <motion.span
+          layoutId="insights-active-pill"
+          className="absolute inset-0 -z-10 rounded-full bg-gold"
+          transition={{ type: 'spring', stiffness: 400, damping: 34 }}
+        />
+      )}
+      {children}
+    </button>
   )
 }
 
@@ -50,14 +69,14 @@ export function CategoryPills({ categories }: { categories: string[] }) {
   const { active, setActive } = useCategoryFilter()
 
   return (
-    <div className="mt-7 flex flex-wrap gap-[0.6rem]">
-      <button type="button" onClick={() => setActive('all')} className={pillClasses(active === 'all')}>
+    <div className="mt-8 flex flex-wrap gap-[0.6rem]">
+      <Pill active={active === 'all'} onClick={() => setActive('all')}>
         All
-      </button>
+      </Pill>
       {categories.map((category) => (
-        <button key={category} type="button" onClick={() => setActive(category)} className={pillClasses(active === category)}>
+        <Pill key={category} active={active === category} onClick={() => setActive(category)}>
           {CATEGORY_LABELS[category] ?? category}
-        </button>
+        </Pill>
       ))}
     </div>
   )
@@ -69,17 +88,31 @@ export function FilteredArticleList({ articles }: { articles: ArticleListItem[] 
 
   if (filtered.length === 0) {
     return (
-      <p className="border border-dashed border-line-strong p-10 text-center font-sans text-body">
+      <p className="rounded-[var(--radius-md)] border border-dashed border-line-strong p-10 text-center font-sans text-body">
         No briefings in this category yet.
       </p>
     )
   }
 
+  // Briefings leaving the filter fade out, the rest close ranks, newcomers rise in.
   return (
     <div className="flex flex-col">
-      {filtered.map((article) => (
-        <ArticleCard key={article.slug} article={article} showCategory />
-      ))}
+      <AnimatePresence initial={false} mode="popLayout">
+        {filtered.map((article, i) => (
+          <motion.div
+            key={article.slug}
+            layout
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.5, delay: Math.min(i, 6) * 0.04, ease: EASE_OUT }}
+            // Each card draws its own top rule; only the last keeps its bottom one.
+            className="[&:not(:last-child)>a]:border-b-0"
+          >
+            <ArticleCard article={article} showCategory />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   )
 }

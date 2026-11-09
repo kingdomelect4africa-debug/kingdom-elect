@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useScroll, useTransform } from 'motion/react'
-import { EASE_IN_OUT, EASE_OUT } from '@/components/motion/primitives'
+import { EASE_OUT } from '@/components/motion/primitives'
 
 /**
  * The emerald band opens out from an inset, rounded panel to full bleed as it
@@ -18,29 +18,6 @@ export function ExpandingBand({ children, className }: { children: React.ReactNo
     <motion.div ref={ref} style={{ clipPath }} className={`scroll-fx ${className ?? ''}`}>
       {children}
     </motion.div>
-  )
-}
-
-/** The brand's "Influence Lines": concentric arcs sweeping out of a corner. */
-export function InfluenceLines({ className }: { className?: string }) {
-  const arcs = [150, 230, 310, 390, 470, 550, 630, 710]
-  return (
-    <svg viewBox="0 0 800 800" preserveAspectRatio="xMaxYMax slice" className={className} aria-hidden="true">
-      {arcs.map((r, i) => (
-        <motion.path
-          key={r}
-          d={`M${800 - r},800 A${r},${r} 0 0 1 800,${800 - r}`}
-          fill="none"
-          stroke={i % 3 === 1 ? 'var(--color-gold)' : 'var(--color-ivory)'}
-          strokeOpacity={i % 3 === 1 ? 0.55 : 0.14}
-          strokeWidth={i % 3 === 1 ? 1.4 : 1}
-          initial={{ pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 2.2, delay: 0.2 + i * 0.09, ease: EASE_IN_OUT }}
-        />
-      ))}
-    </svg>
   )
 }
 
@@ -65,11 +42,10 @@ function remainingUntil(target: number, now: number): Remaining | null {
 }
 
 /**
- * A glass event card. The light under the pointer follows it across the
- * card, and a live countdown runs to the opening session.
+ * Days, hours, minutes and seconds to `startsAt`, ticking live, each digit
+ * sliding as it changes. For dark backgrounds. Hidden once the event starts.
  */
-export function EventPanel({ startsAt, children, action }: { startsAt: string; children: React.ReactNode; action: React.ReactNode }) {
-  const card = useRef<HTMLDivElement>(null)
+export function Countdown({ startsAt, className }: { startsAt: string; className?: string }) {
   // The time is only known in the browser, so the server renders placeholders.
   const [now, setNow] = useState<number | null>(null)
   const target = new Date(startsAt).getTime()
@@ -81,6 +57,49 @@ export function EventPanel({ startsAt, children, action }: { startsAt: string; c
   }, [])
 
   const left = now === null ? undefined : remainingUntil(target, now)
+  if (left === null) return null
+
+  return (
+    <div
+      className={`grid grid-cols-4 border-y border-ivory/15 ${className ?? ''}`}
+      role="timer"
+      aria-label={left ? `${left.days} days, ${left.hours} hours and ${left.minutes} minutes to go` : 'Countdown'}
+    >
+      {UNITS.map((unit, i) => (
+        <div key={unit.key} className={i > 0 ? 'border-l border-ivory/15 py-3 text-center' : 'py-3 text-center'}>
+          <div className="relative h-[2.1rem] overflow-hidden font-serif text-[clamp(1.4rem,2.4vw,1.75rem)] font-semibold leading-[2.1rem] text-ivory tabular-nums">
+            {left ? (
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={left[unit.key]}
+                  className="block"
+                  initial={{ y: '-100%', opacity: 0 }}
+                  animate={{ y: '0%', opacity: 1 }}
+                  exit={{ y: '100%', opacity: 0 }}
+                  transition={{ duration: 0.45, ease: EASE_OUT }}
+                >
+                  {String(left[unit.key]).padStart(2, '0')}
+                </motion.span>
+              </AnimatePresence>
+            ) : (
+              <span className="block text-ivory/40">--</span>
+            )}
+          </div>
+          <div className="mt-1 font-sans text-[0.6rem] font-semibold uppercase text-ivory/55" style={{ letterSpacing: '0.12em' }}>
+            {unit.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/**
+ * A glass event card. The light under the pointer follows it across the
+ * card, and a live countdown runs to the opening session.
+ */
+export function EventPanel({ startsAt, children, action }: { startsAt: string; children: React.ReactNode; action: React.ReactNode }) {
+  const card = useRef<HTMLDivElement>(null)
 
   function follow(event: React.PointerEvent<HTMLDivElement>) {
     const el = card.current
@@ -107,39 +126,7 @@ export function EventPanel({ startsAt, children, action }: { startsAt: string; c
       />
       <div className="relative">
         {children}
-        {left !== null && (
-          <div
-            className="mt-6 grid grid-cols-4 border-y border-ivory/15"
-            role="timer"
-            aria-label={left ? `${left.days} days, ${left.hours} hours and ${left.minutes} minutes to go` : 'Countdown'}
-          >
-            {UNITS.map((unit, i) => (
-              <div key={unit.key} className={i > 0 ? 'border-l border-ivory/15 py-3 text-center' : 'py-3 text-center'}>
-                <div className="relative h-[2.1rem] overflow-hidden font-serif text-[clamp(1.4rem,2.4vw,1.75rem)] font-semibold leading-[2.1rem] text-ivory tabular-nums">
-                  {left ? (
-                    <AnimatePresence mode="popLayout" initial={false}>
-                      <motion.span
-                        key={left[unit.key]}
-                        className="block"
-                        initial={{ y: '-100%', opacity: 0 }}
-                        animate={{ y: '0%', opacity: 1 }}
-                        exit={{ y: '100%', opacity: 0 }}
-                        transition={{ duration: 0.45, ease: EASE_OUT }}
-                      >
-                        {String(left[unit.key]).padStart(2, '0')}
-                      </motion.span>
-                    </AnimatePresence>
-                  ) : (
-                    <span className="block text-ivory/40">--</span>
-                  )}
-                </div>
-                <div className="mt-1 font-sans text-[0.6rem] font-semibold uppercase text-ivory/55" style={{ letterSpacing: '0.12em' }}>
-                  {unit.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <Countdown startsAt={startsAt} className="mt-6" />
         <div className="mt-6">{action}</div>
       </div>
     </motion.div>

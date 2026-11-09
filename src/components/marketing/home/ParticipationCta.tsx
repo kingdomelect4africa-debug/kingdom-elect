@@ -2,7 +2,7 @@ import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 import { Reveal, SplitWords } from '@/components/motion/primitives'
 import { LogoMark } from '@/components/marketing/LogoMark'
-import { DrawnNetwork } from './DrawnNetwork'
+import { DrawnNetwork } from '@/components/devices/DrawnNetwork'
 
 export function ParticipationCta({
   heading,

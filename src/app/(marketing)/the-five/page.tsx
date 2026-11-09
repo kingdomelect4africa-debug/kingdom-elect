@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Kicker } from '@/components/ui/Section'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { PageHero } from '@/components/marketing/PageHero'
+import { Reveal } from '@/components/motion/primitives'
 import { FiveExplorer, type PillarContent, type PillarRelated } from '@/components/marketing/the-five/FiveExplorer'
 import type { PillarTag } from '@prisma/client'
 
@@ -51,20 +52,14 @@ export default async function TheFivePage() {
 
   return (
     <>
-      <SetNavTone tone="light" />
-      <section className="bg-ivory pb-4 pt-[clamp(3.5rem,8vw,5.5rem)]">
-        <Container>
-          <Kicker>Collective Influence</Kicker>
-          <h1 className="mt-4 max-w-3xl font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
-            {content.heading}
-          </h1>
-          <p className="mt-5 max-w-[560px] font-sans text-[1.05rem] leading-[1.8] text-body">{content.intro}</p>
-        </Container>
-      </section>
+      <SetNavTone tone="dark" />
+      <PageHero id="the-five" eyebrow="Collective Influence" title={content.heading} intro={content.intro} motif="pillars" />
 
-      <section className="bg-ivory py-[clamp(4.5rem,9vw,8.5rem)] pt-4">
+      <section className="bg-ivory py-[clamp(4rem,8vw,6.5rem)]">
         <Container>
-          <FiveExplorer pillars={pillars} related={related} />
+          <Reveal amount={0.1}>
+            <FiveExplorer pillars={pillars} related={related} />
+          </Reveal>
         </Container>
       </section>
     </>

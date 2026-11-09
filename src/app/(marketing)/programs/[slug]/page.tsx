@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Kicker } from '@/components/ui/Section'
 import { Button } from '@/components/ui/Button'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { PageHero } from '@/components/marketing/PageHero'
+import { Reveal } from '@/components/motion/primitives'
 import { ApplicationForm } from '@/components/marketing/forms/ApplicationForm'
 import type { FormFieldConfig } from '@/lib/forms'
 
@@ -51,42 +52,33 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
 
   return (
     <>
-      <SetNavTone tone="light" />
+      <SetNavTone tone="dark" />
+      <PageHero id="program" eyebrow={STATUS_LABELS[program.status] ?? program.status} title={program.title} intro={program.summary} motif="pillars">
+        {program.pillarTags.length > 0 && (
+          <div className="mt-7 flex flex-wrap gap-2">
+            {program.pillarTags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-[var(--radius-sm)] border border-line-navy-strong px-3 py-[0.4rem] font-sans text-[0.72rem] uppercase text-body-on-navy"
+                style={{ letterSpacing: '0.04em' }}
+              >
+                {PILLAR_LABELS[tag] ?? tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </PageHero>
 
-      <section className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(2.5rem,5vw,3.5rem)]">
-        <Container>
-          <Kicker>{STATUS_LABELS[program.status] ?? program.status}</Kicker>
-          <h1 className="mt-4 max-w-[780px] font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
-            {program.title}
-          </h1>
-          <p className="mt-5 max-w-[560px] font-sans text-[1.05rem] leading-[1.8] text-body">{program.summary}</p>
-
-          {program.pillarTags.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {program.pillarTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-[var(--radius-sm)] border border-line-strong px-3 py-[0.4rem] font-sans text-[0.72rem] uppercase text-body"
-                  style={{ letterSpacing: '0.04em' }}
-                >
-                  {PILLAR_LABELS[tag] ?? tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </Container>
-      </section>
-
-      <section className="bg-ivory pb-[clamp(4.5rem,9vw,8.5rem)]">
+      <section className="bg-ivory py-[clamp(4rem,8vw,6.5rem)]">
         <Container>
           <div className="grid gap-16 lg:grid-cols-12">
-            <div className="lg:col-span-7">
+            <Reveal className="lg:col-span-7">
               <h2 className="font-serif text-2xl font-semibold text-ink">Overview</h2>
               <p className="mt-4 whitespace-pre-line font-sans leading-[1.8] text-body">{program.description}</p>
-            </div>
+            </Reveal>
 
             <div className="lg:col-span-4 lg:col-start-9">
-              <div className="rounded-[var(--radius-md)] border border-line p-[1.75rem]">
+              <Reveal delay={0.1} amount={0.02} className="rounded-[var(--radius-md)] border border-line bg-ivory p-[1.75rem] shadow-[0_30px_70px_-45px_rgba(11,31,58,0.45)] lg:sticky lg:top-28">
                 {applicationFields.length > 0 ? (
                   <>
                     <h2 className="font-serif text-xl font-semibold text-ink">Apply</h2>
@@ -110,7 +102,7 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
                     </div>
                   </>
                 )}
-              </div>
+              </Reveal>
             </div>
           </div>
         </Container>

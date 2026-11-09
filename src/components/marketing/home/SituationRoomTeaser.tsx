@@ -4,7 +4,8 @@ import { Kicker, LinkArrow } from '@/components/ui/Section'
 import { Reveal, SplitWords } from '@/components/motion/primitives'
 import { KingdomGrid } from '@/components/devices/KingdomGrid'
 import { formatDateRange, countryName } from '@/lib/format'
-import { EventPanel, ExpandingBand, InfluenceLines } from './SituationRoomBand'
+import { InfluenceLines } from '@/components/devices/InfluenceLines'
+import { EventPanel, ExpandingBand } from './SituationRoomBand'
 
 export function SituationRoomTeaser({
   heading,

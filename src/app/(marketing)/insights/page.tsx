@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
-import { Kicker } from '@/components/ui/Section'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { PageHero } from '@/components/marketing/PageHero'
+import { KingdomGrid } from '@/components/devices/KingdomGrid'
+import { Reveal } from '@/components/motion/primitives'
 import { CategoryFilterProvider, CategoryPills, FilteredArticleList } from '@/components/marketing/insights/CategoryFilter'
 
 export const revalidate = 60
@@ -23,29 +25,30 @@ export default async function InsightsPage() {
 
   return (
     <CategoryFilterProvider>
-      <SetNavTone tone="light" />
+      <SetNavTone tone="dark" />
+      <PageHero
+        id="insights"
+        eyebrow="Kingdom Intelligence"
+        title="Research, briefings, and strategic perspective."
+        intro="Perspective for those who govern spheres, not just administer functions."
+        motif="grid"
+      >
+        {articles.length > 0 && <CategoryPills categories={categories} />}
+      </PageHero>
 
-      <header className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(2.5rem,5vw,3.5rem)]">
-        <Container>
-          <Kicker>Kingdom Intelligence</Kicker>
-          <h1 className="mt-4 max-w-[780px] font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">
-            Research, briefings, and strategic perspective.
-          </h1>
-          <p className="mt-5 max-w-[560px] font-sans text-[1.05rem] text-body">
-            Perspective for those who govern spheres, not just administer functions.
-          </p>
-          {articles.length > 0 && <CategoryPills categories={categories} />}
-        </Container>
-      </header>
-
-      <section className="bg-ivory pt-4 pb-[clamp(4.5rem,9vw,8.5rem)]">
+      <section className="bg-ivory py-[clamp(3.5rem,7vw,6rem)]">
         <Container>
           {articles.length > 0 ? (
             <FilteredArticleList articles={articles} />
           ) : (
-            <p className="border border-dashed border-line-strong p-10 text-center font-sans text-body">
-              The intelligence desk is quiet for now — new research and briefings will appear here.
-            </p>
+            <Reveal className="relative overflow-hidden rounded-[var(--radius-md)] border border-line bg-ivory-dim/50 px-[clamp(1.5rem,4vw,3rem)] py-[clamp(2.5rem,5vw,3.5rem)]">
+              <div className="absolute inset-0 text-gold-dark opacity-[0.09] [mask-image:linear-gradient(270deg,black,transparent_65%)]" aria-hidden="true">
+                <KingdomGrid id="insights-empty-grid" className="h-full w-full" />
+              </div>
+              <p className="relative max-w-[460px] font-serif text-[clamp(1.15rem,1.8vw,1.35rem)] leading-[1.5] text-ink">
+                The intelligence desk is quiet for now. New research and briefings will appear here.
+              </p>
+            </Reveal>
           )}
         </Container>
       </section>

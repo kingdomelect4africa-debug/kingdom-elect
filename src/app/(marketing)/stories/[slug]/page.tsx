@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
 import { SetNavTone } from '@/components/marketing/NavTone'
+import { ReadingProgress, Reveal, SplitWords } from '@/components/motion/primitives'
 
 export const revalidate = 60
 
@@ -29,18 +30,25 @@ export default async function StoryDetailPage({ params }: { params: Promise<{ sl
   return (
     <article className="bg-ivory pt-[clamp(3.5rem,8vw,5.5rem)] pb-[clamp(4.5rem,9vw,8.5rem)]">
       <SetNavTone tone="light" />
+      <ReadingProgress />
       <Container>
         <div className="mx-auto max-w-[680px]">
           <Kicker>
             {story.personFeatured.firstName} {story.personFeatured.lastName}
             {story.personFeatured.title ? ` · ${story.personFeatured.title}` : ''}
           </Kicker>
-          <h1 className="mt-4 font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.12] text-ink">{story.title}</h1>
-          <p className="mt-5 font-sans text-[1.1rem] text-body">{story.summary}</p>
+          <h1 className="mt-4 font-serif text-[clamp(2.3rem,5vw,3.6rem)] font-semibold leading-[1.1] text-ink">
+            <SplitWords text={story.title} delay={0.1} />
+          </h1>
+          <Reveal delay={0.35} y={16}>
+            <p className="mt-5 font-sans text-[1.1rem] text-body">{story.summary}</p>
+          </Reveal>
 
-          <div className="mt-10 whitespace-pre-line border-t border-line pt-10 font-sans text-[1.05rem] leading-[1.85] text-body">
-            {story.body}
-          </div>
+          <Reveal delay={0.5} y={20} amount={0.05}>
+            <div className="mt-10 whitespace-pre-line border-t border-line pt-10 font-sans text-[1.05rem] leading-[1.85] text-body">
+              {story.body}
+            </div>
+          </Reveal>
 
           {(story.relatedProgram || story.relatedEvent || story.relatedChapter) && (
             <div className="mt-12 flex flex-wrap gap-3 border-t border-line pt-8">
