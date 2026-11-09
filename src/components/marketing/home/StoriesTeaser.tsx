@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
+import { Reveal } from '@/components/motion/primitives'
 
 const GRADIENTS = [
   'linear-gradient(140deg, var(--color-navy-deep), var(--color-navy-mid) 55%, var(--color-gold-dark))',
@@ -22,16 +23,17 @@ export function StoriesTeaser({ stories }: { stories: StoryItem[] }) {
   return (
     <section id="stories" className="bg-ivory py-[clamp(4.5rem,9vw,8.5rem)]">
       <Container>
-        <div className="max-w-[560px]">
+        <Reveal className="max-w-[560px]">
           <Kicker>Stories</Kicker>
           <h2 className="mt-4 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] font-semibold text-ink">Transformation, one person at a time.</h2>
-        </div>
+        </Reveal>
 
         <div className="mt-9 grid gap-7 sm:grid-cols-2">
           {stories.map((story, i) => (
-            <Link key={story.slug} href={`/stories/${story.slug}`} className="group relative isolate aspect-[4/3] overflow-hidden rounded-[var(--radius-md)]">
+            <Reveal key={story.slug} delay={(i % 2) * 0.12}>
+            <Link href={`/stories/${story.slug}`} className="group relative isolate block aspect-[4/3] overflow-hidden rounded-[var(--radius-md)]">
               <div
-                className="absolute inset-0 animate-[mediashift_12s_ease_infinite] bg-[length:220%_220%]"
+                className="absolute inset-0 animate-[mediashift_12s_ease_infinite] bg-[length:220%_220%] transition-transform duration-[1.2s] ease-[var(--ease-signature)] group-hover:scale-[1.06]"
                 style={{ backgroundImage: GRADIENTS[i % GRADIENTS.length] }}
               />
               <div className="absolute inset-0 bg-gradient-to-b from-transparent from-40% to-navy-deep/92" />
@@ -45,6 +47,7 @@ export function StoriesTeaser({ stories }: { stories: StoryItem[] }) {
                 </p>
               </div>
             </Link>
+            </Reveal>
           ))}
         </div>
       </Container>

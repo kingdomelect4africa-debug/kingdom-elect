@@ -1,5 +1,6 @@
 import { Container } from '@/components/ui/Container'
 import { Kicker } from '@/components/ui/Section'
+import { Reveal } from '@/components/motion/primitives'
 import type { Organization } from '@prisma/client'
 
 export function PartnersWall({ partners }: { partners: Pick<Organization, 'name' | 'slug' | 'type'>[] }) {
@@ -10,10 +11,10 @@ export function PartnersWall({ partners }: { partners: Pick<Organization, 'name'
       <Container>
         <Kicker>Institutional Partners</Kicker>
         <div className="mt-7 flex flex-wrap items-center justify-between gap-[clamp(2rem,6vw,5rem)]">
-          {partners.map((partner) => (
-            <span key={partner.slug} className="font-serif text-[1.1rem] text-body opacity-75 transition-opacity hover:opacity-100">
-              {partner.name}
-            </span>
+          {partners.map((partner, i) => (
+            <Reveal key={partner.slug} delay={i * 0.08} y={14}>
+              <span className="font-serif text-[1.1rem] text-body opacity-75 transition-opacity hover:opacity-100">{partner.name}</span>
+            </Reveal>
           ))}
         </div>
       </Container>

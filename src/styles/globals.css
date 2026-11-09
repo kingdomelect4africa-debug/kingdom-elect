@@ -15,3 +15,67 @@ html {
   background-color: var(--color-gold-200);
   color: var(--color-navy-700);
 }
+
+/* Homepage motion loops. The reduced-motion rule in tokens.css stops all of
+   these, and each one comes to rest on a sensible final frame. */
+
+/* The hero's five pillars breathe once they have risen. */
+@keyframes pillar-breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.9);
+  }
+}
+
+/* Minimal gold particles drifting upward (Motion Identity: "Particles"). */
+@keyframes mote {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: var(--mote-opacity, 0.7);
+  }
+  100% {
+    transform: translate3d(var(--mote-drift, 10px), -150px, 0);
+    opacity: 0;
+  }
+}
+
+/* A soft ring expanding outward and fading (logo animation: "Radiate"). */
+@keyframes radiate {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Scroll-linked effects (the Africa map, the lit-up manifesto, the opening
+   emerald band) run on motion values that the server renders at their
+   starting point. For reduced motion, show their finished state from CSS so
+   the server and browser render the same markup. */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-fx {
+    clip-path: none !important;
+  }
+  .scroll-fx-children > *,
+  .scroll-fx-children > g > * {
+    opacity: 1 !important;
+    stroke-dasharray: none !important;
+    transform: none !important;
+  }
+}

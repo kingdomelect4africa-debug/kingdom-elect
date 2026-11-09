@@ -3,7 +3,7 @@
  * (gold/emerald/navy-light) beneath fine concentric orbit rings and node
  * points. Stands in for photography across the hero sections: on-brand,
  * infinitely crisp, no licensing surface, and consistent with the rest of
- * the signature device family (HeroBars, HeroGridLines, NetworkNodes).
+ * the signature device family (KingdomGrid, NetworkNodes).
  */
 export function KingdomAura({ className, tone = 'navy' }: { className?: string; tone?: 'navy' | 'deep' }) {
   const ringStroke = tone === 'deep' ? 'rgba(247,243,234,0.16)' : 'rgba(247,243,234,0.14)'
