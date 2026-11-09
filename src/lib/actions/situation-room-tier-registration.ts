@@ -5,6 +5,7 @@ import { slugify } from '@/lib/format'
 import { sendSituationRoomTierEmails } from '@/lib/email'
 import {
   ACCESS_TIERS,
+  TIER_EVENT_SLUG,
   asksAccommodation,
   cleanTierAnswers,
   displaySector,
@@ -12,8 +13,6 @@ import {
   type AccessTier,
   type TierErrors,
 } from '@/lib/situation-room-tiers'
-
-const EVENT_SLUG = 'the-situation-room-2026'
 
 export type TierSubmitResult = { success: true } | { success: false; message: string; errors?: TierErrors }
 
@@ -24,7 +23,7 @@ export async function submitSituationRoomTierRegistration(tier: AccessTier, raw:
   const errors = validateTierAnswers(answers, tier)
   if (Object.keys(errors).length > 0) return { success: false, message: 'Please check the highlighted answers.', errors }
 
-  const event = await prisma.event.findUnique({ where: { slug: EVENT_SLUG } })
+  const event = await prisma.event.findUnique({ where: { slug: TIER_EVENT_SLUG } })
   if (!event) return { success: false, message: 'This event could not be found. Please contact the organizing team.' }
   if (event.registrationStatus === 'CLOSED') return { success: false, message: 'Registration for this event is closed.' }
 

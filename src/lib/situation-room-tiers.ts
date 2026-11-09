@@ -9,6 +9,19 @@ import { INDUSTRY_OPTIONS, PHONE_COUNTRY_CODES } from '@/components/marketing/si
 export type AccessTier = 'VVIP' | 'VIP'
 export const ACCESS_TIERS: AccessTier[] = ['VVIP', 'VIP']
 
+/** Both forms register people for this event. */
+export const TIER_EVENT_SLUG = 'the-situation-room-2026'
+
+/** Where each form lives on the public site. */
+export const TIER_PATHS: Record<AccessTier, string> = {
+  VVIP: '/the-situation-room/vvip',
+  VIP: '/the-situation-room/vip',
+}
+
+export function tierFormName(tier: AccessTier): string {
+  return `${tier} Registration — The Situation Room`
+}
+
 /** Accommodation, and the spouse question that follows it, are VIP only. */
 export function asksAccommodation(tier: AccessTier): boolean {
   return tier === 'VIP'
@@ -45,6 +58,29 @@ export const TIER_QUESTIONS = {
   needs_accommodation: 'Will you be needing accommodation?',
   spouse_attending: 'Will you be coming with your spouse?',
   willing_to_partner: 'Are you willing to partner with or give towards the Situation Room?',
+}
+
+/**
+ * Each form's questions in the order its page shows them, for the read-only
+ * view in the admin Form Builder. Keep in step with the two form components.
+ */
+export function tierQuestionList(tier: AccessTier): { label: string; answers: string }[] {
+  const Q = TIER_QUESTIONS
+  return [
+    { label: Q.full_name, answers: 'Text' },
+    { label: Q.email, answers: 'Email address' },
+    { label: Q.phone_number, answers: 'Country code and number' },
+    { label: Q.gender, answers: GENDER_OPTIONS.join(' / ') },
+    { label: Q.sector, answers: `One of ${SECTOR_OPTIONS.length} sectors, the same list as the main registration form. "Other" asks them to specify.` },
+    { label: Q.business_niche, answers: 'Text' },
+    ...(asksAccommodation(tier)
+      ? [
+          { label: Q.needs_accommodation, answers: YES_NO_OPTIONS.join(' / ') },
+          { label: Q.spouse_attending, answers: YES_NO_OPTIONS.join(' / ') },
+        ]
+      : []),
+    { label: Q.willing_to_partner, answers: YES_NO_OPTIONS.join(' / ') },
+  ]
 }
 
 export type TierAnswers = {
